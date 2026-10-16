@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Analytics — LinkPulse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<%- include('partials/nav', { page: 'analytics' }) %>
+
+<main class="main-content">
+  <div class="container">
+
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Analytics</h1>
+        <p class="page-sub">Live click telemetry across all links and campaigns.</p>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value"><%= totalClicks %></div>
+        <div class="stat-label">Total Clicks</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value"><%= totalLinks %></div>
+        <div class="stat-label">Links</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value"><%= activeLinks %></div>
+        <div class="stat-label">Active Links</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value"><%= totalCampaigns %></div>
+        <div class="stat-label">Campaigns</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-grid">
+      <div class="card chart-card chart-wide">
+        <div class="card-title">Clicks — Last 7 Days</div>
+        <canvas id="clicksChart" height="90"></canvas>
+      </div>
+      <div class="card chart-card">
+        <div class="card-title">Device</div>
+        <canvas id="deviceChart" height="160"></canvas>
+      </div>
+      <div class="card chart-card">
+        <div class="card-title">Browser</div>
+        <canvas id="browserChart" height="160"></canvas>
+      </div>
+      <div class="card chart-card">
+        <div class="card-title">QR vs Direct</div>
+        <canvas id="sourceChart" height="160"></canvas>
+      </div>
+      <div class="card chart-card">
+        <div class="card-title">Top Countries</div>
+        <canvas id="countryChart" height="160"></canvas>
+      </div>
+    </div>
+
+    <!-- Top Links -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">Top Links by Clicks</h2>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Short URL</th>
+              <th>Title</th>
+              <th style="text-align:right">Clicks</th>
+              <th>Status</th>
+              <th style="text-align:right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% topLinks.forEach((link, i) => { %>
+            <tr>
+              <td class="muted" style="font-size:0.8rem"><%= i + 1 %></td>
+              <td><a href="/<%= link.shortCode %>" target="_blank" class="code-link">/<%= link.shortCode %></a></td>
+              <td><%= link.title %></td>
+              <td style="text-align:right">
+                <strong><%= link.currentClicks %></strong>
+                <% if (link.maxClicks) { %><span class="muted" style="font-size:0.775rem"> / <%= link.maxClicks %></span><% } %>
+              </td>
+              <td><span class="badge badge-<%= link.status %>"><%= link.status %></span></td>
+              <td style="text-align:right">
+                <div class="actions-cell">
+                  <button type="button" class="btn-action" title="Copy Short Link" onclick="copyLink('<%= link.shortCode %>', this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  </button>
+                  <button type="button" class="btn-action" title="Share Link &amp; QR" onclick="openShareModal('<%= link.shortCode %>', '<%= (link.title || '').replace(/'/g, "\\'") %>')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<%- include('partials/share-modal') %>
+<%- include('partials/footer') %>
+
+<script>
+Chart.defaults.font.family = 'Inter';
+Chart.defaults.color = '#9a9a92';
+
+const PALETTE = ['#1a1a18', '#6b6b65', '#b0b0a8', '#d8d8d0', '#e8e8e0'];
+const ACCENT_PALETTE = ['#2563eb', '#16a34a', '#dc2626', '#d97706', '#7c3aed'];
+
+function donut(id, labels, data) {
+  new Chart(document.getElementById(id), {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: ACCENT_PALETTE,
+        borderWidth: 0,
+        hoverOffset: 4,
+      }]
+    },
+    options: {
+      cutout: '68%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { font: { size: 11 }, padding: 12, boxWidth: 10, boxHeight: 10 }
+        }
+      }
+    }
+  });
+}
+
+// Clicks over time
+new Chart(document.getElementById('clicksChart'), {
+  type: 'bar',
+  data: {
+    labels: <%- JSON.stringify(last7.map(d => d.label)) %>,
+    datasets: [{
+      label: 'Clicks',
+      data: <%- JSON.stringify(last7.map(d => d.count)) %>,
+      backgroundColor: '#1a1a18',
+      borderRadius: 5,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { beginAtZero: true, grid: { color: '#f0f0ec' }, ticks: { font: { size: 11 } } },
+      x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+    }
+  }
+});
+
+const dm = <%- JSON.stringify(deviceMap) %>;
+donut('deviceChart', Object.keys(dm), Object.values(dm));
+
+const bm = <%- JSON.stringify(browserMap) %>;
+donut('browserChart', Object.keys(bm), Object.values(bm));
+
+const sm = <%- JSON.stringify(sourceMap) %>;
+donut('sourceChart', Object.keys(sm), Object.values(sm));
+
+const cm = <%- JSON.stringify(countryMap) %>;
+new Chart(document.getElementById('countryChart'), {
+  type: 'bar',
+  data: {
+    labels: Object.keys(cm),
+    datasets: [{ label: 'Clicks', data: Object.values(cm), backgroundColor: '#1a1a18', borderRadius: 4 }]
+  },
+  options: {
+    indexAxis: 'y',
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { beginAtZero: true, grid: { color: '#f0f0ec' }, ticks: { font: { size: 11 } } },
+      y: { grid: { display: false }, ticks: { font: { size: 11 } } },
+    }
+  }
+});
+</script>
+
+</body>
+</html>

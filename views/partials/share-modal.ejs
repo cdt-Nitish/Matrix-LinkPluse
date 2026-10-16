@@ -1,0 +1,334 @@
+<!-- Share Link Modal -->
+<div id="shareModalBackdrop" class="modal-overlay" onclick="handleBackdropClick(event)">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        <span id="shareModalTitle" class="modal-title">Share Link</span>
+        <span id="shareModalBadge" class="code-link" style="font-size:0.75rem;padding:2px 6px;"></span>
+      </div>
+      <button type="button" class="modal-close-btn" onclick="closeShareModal()" title="Close (Esc)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Destination URL info -->
+      <div id="shareModalDest" class="modal-dest-hint"></div>
+
+      <!-- Shareable Link Format Tabs -->
+      <div>
+        <label style="margin-bottom:6px;">Link Format</label>
+        <div class="share-type-tabs">
+          <button type="button" class="share-tab-btn active" id="tabDirect" onclick="setShareMode('direct')">
+            Direct Link
+          </button>
+          <button type="button" class="share-tab-btn" id="tabQr" onclick="setShareMode('qr')">
+            QR Tracked (?src=qr)
+          </button>
+        </div>
+      </div>
+
+      <!-- Shareable Link Input with Copy Button -->
+      <div>
+        <label for="shareUrlInput">Shareable Link</label>
+        <div class="share-input-group">
+          <input type="text" id="shareUrlInput" class="share-url-input" readonly onclick="this.select()" />
+          <button type="button" id="shareCopyBtn" class="btn btn-primary" onclick="copyShareInput()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-right:4px"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span id="shareCopyText">Copy</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- QR Code Preview & Download -->
+      <div class="qr-section">
+        <div class="qr-canvas-wrap" id="qrContainer">
+          <div id="qrCodeDiv"></div>
+        </div>
+        <div class="qr-info">
+          <div class="qr-title">Dynamic QR Code</div>
+          <div class="qr-sub">Scans track device &amp; source telemetry in real-time.</div>
+          <div>
+            <button type="button" class="btn btn-sm btn-ghost" onclick="downloadQRCode()" style="margin-top:4px">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download QR
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Social Sharing -->
+      <div>
+        <label style="margin-bottom:6px;">Share to Apps</label>
+        <div class="share-social-grid">
+          <button type="button" id="nativeShareBtn" class="btn-social btn-social-primary" onclick="triggerNativeShare()" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            Share via Device
+          </button>
+
+          <!-- WhatsApp -->
+          <a id="shareWhatsApp" href="#" target="_blank" rel="noopener noreferrer" class="btn-social">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+            WhatsApp
+          </a>
+          
+          <!-- Twitter / X -->
+          <a id="shareTwitter" href="#" target="_blank" rel="noopener noreferrer" class="btn-social">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            X (Twitter)
+          </a>
+
+          <!-- LinkedIn -->
+          <a id="shareLinkedIn" href="#" target="_blank" rel="noopener noreferrer" class="btn-social">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+            LinkedIn
+          </a>
+
+          <!-- Telegram -->
+          <a id="shareTelegram" href="#" target="_blank" rel="noopener noreferrer" class="btn-social">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.323-.62.323l.213-3.053 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.848.957z"/></svg>
+            Telegram
+          </a>
+
+          <!-- Email -->
+          <a id="shareEmail" href="#" class="btn-social">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Email
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Feedback Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- QRCode Library with safe fallback -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+// State
+let currentShortCode = '';
+let currentTitle = '';
+let currentDestUrl = '';
+let currentShareMode = 'direct'; // 'direct' or 'qr'
+let qrcodeInstance = null;
+
+// Copy link function (called from buttons)
+function copyLink(code, btn) {
+  const url = window.location.origin + '/' + code;
+  copyTextToClipboard(url, () => {
+    showToast('Short link copied: ' + url);
+    if (btn) {
+      const origHtml = btn.innerHTML;
+      btn.classList.add('copied');
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = origHtml;
+      }, 1800);
+    }
+  });
+}
+
+// Open Share Modal
+function openShareModal(code, title, destUrl) {
+  currentShortCode = code || '';
+  currentTitle = title || 'Check out this link';
+  currentDestUrl = destUrl || '';
+  currentShareMode = 'direct';
+
+  document.getElementById('shareModalBadge').textContent = '/' + currentShortCode;
+  const destEl = document.getElementById('shareModalDest');
+  if (currentDestUrl) {
+    destEl.textContent = 'Destination: ' + currentDestUrl;
+    destEl.style.display = 'block';
+  } else {
+    destEl.style.display = 'none';
+  }
+
+  // Update tabs
+  document.getElementById('tabDirect').classList.add('active');
+  document.getElementById('tabQr').classList.remove('active');
+
+  // Check Web Share API
+  const nativeBtn = document.getElementById('nativeShareBtn');
+  if (navigator.share) {
+    nativeBtn.style.display = 'inline-flex';
+  } else {
+    nativeBtn.style.display = 'none';
+  }
+
+  updateShareUrlAndQr();
+
+  const backdrop = document.getElementById('shareModalBackdrop');
+  backdrop.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeShareModal() {
+  const backdrop = document.getElementById('shareModalBackdrop');
+  backdrop.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function handleBackdropClick(e) {
+  if (e.target.id === 'shareModalBackdrop') {
+    closeShareModal();
+  }
+}
+
+// ESC key listener
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeShareModal();
+});
+
+// Set Share Mode (Direct vs QR)
+function setShareMode(mode) {
+  currentShareMode = mode;
+  document.getElementById('tabDirect').classList.toggle('active', mode === 'direct');
+  document.getElementById('tabQr').classList.toggle('active', mode === 'qr');
+  updateShareUrlAndQr();
+}
+
+function getActiveShareUrl() {
+  const base = window.location.origin + '/' + currentShortCode;
+  return currentShareMode === 'qr' ? base + '?src=qr' : base;
+}
+
+function updateShareUrlAndQr() {
+  const url = getActiveShareUrl();
+  document.getElementById('shareUrlInput').value = url;
+
+  // Social share links
+  const encUrl = encodeURIComponent(url);
+  const encText = encodeURIComponent(currentTitle ? currentTitle + ' — ' + url : url);
+
+  document.getElementById('shareWhatsApp').href = 'https://api.whatsapp.com/send?text=' + encText;
+  document.getElementById('shareTwitter').href = 'https://twitter.com/intent/tweet?text=' + encText;
+  document.getElementById('shareLinkedIn').href = 'https://www.linkedin.com/sharing/share-offsite/?url=' + encUrl;
+  document.getElementById('shareTelegram').href = 'https://t.me/share/url?url=' + encUrl + '&text=' + encodeURIComponent(currentTitle);
+  document.getElementById('shareEmail').href = 'mailto:?subject=' + encodeURIComponent(currentTitle) + '&body=' + encUrl;
+
+  // Render QR code
+  renderQrCode(url);
+}
+
+function renderQrCode(text) {
+  const qrDiv = document.getElementById('qrCodeDiv');
+  qrDiv.innerHTML = '';
+
+  if (typeof QRCode !== 'undefined') {
+    try {
+      qrcodeInstance = new QRCode(qrDiv, {
+        text: text,
+        width: 92,
+        height: 92,
+        colorDark: "#1a1a18",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+      });
+      return;
+    } catch(err) {
+      console.warn('QRCode JS error, falling back to image:', err);
+    }
+  }
+
+  // Fallback to QR API image
+  const img = document.createElement('img');
+  img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=92x92&color=1a1a18&bgcolor=ffffff&data=' + encodeURIComponent(text);
+  img.alt = 'QR Code';
+  img.style.width = '92px';
+  img.style.height = '92px';
+  qrDiv.appendChild(img);
+}
+
+function copyShareInput() {
+  const input = document.getElementById('shareUrlInput');
+  input.select();
+  copyTextToClipboard(input.value, () => {
+    const copyText = document.getElementById('shareCopyText');
+    const copyBtn = document.getElementById('shareCopyBtn');
+    copyText.textContent = 'Copied!';
+    copyBtn.classList.add('btn-success');
+    showToast('Shareable link copied to clipboard!');
+    setTimeout(() => {
+      copyText.textContent = 'Copy';
+      copyBtn.classList.remove('btn-success');
+    }, 1800);
+  });
+}
+
+function downloadQRCode() {
+  const canvas = document.querySelector('#qrCodeDiv canvas');
+  if (canvas) {
+    const a = document.createElement('a');
+    a.download = (currentShortCode || 'link') + '-qr.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+    showToast('QR Code downloaded!');
+    return;
+  }
+  const img = document.querySelector('#qrCodeDiv img');
+  if (img) {
+    window.open(img.src, '_blank');
+    showToast('QR Code opened in new tab.');
+  }
+}
+
+function triggerNativeShare() {
+  const url = getActiveShareUrl();
+  if (navigator.share) {
+    navigator.share({
+      title: currentTitle || 'LinkPulse Short Link',
+      text: currentTitle ? currentTitle + ' — ' + url : url,
+      url: url,
+    }).catch(err => {
+      if (err.name !== 'AbortError') console.error('Share error', err);
+    });
+  }
+}
+
+function copyTextToClipboard(text, onSuccess) {
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(onSuccess).catch(() => fallbackCopy(text, onSuccess));
+  } else {
+    fallbackCopy(text, onSuccess);
+  }
+}
+
+function fallbackCopy(text, onSuccess) {
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  textArea.style.position = 'fixed';
+  textArea.style.left = '-9999px';
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  try {
+    document.execCommand('copy');
+    if (onSuccess) onSuccess();
+  } catch (err) {
+    console.error('Copy fallback failed', err);
+  }
+  document.body.removeChild(textArea);
+}
+
+function showToast(message) {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span>' + message + '</span>';
+  container.appendChild(toast);
+
+  requestAnimationFrame(() => toast.classList.add('show'));
+
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 250);
+  }, 2600);
+}
+</script>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard — LinkPulse</title>
+  <meta name="description" content="Manage and track all your short links in one place.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+<%- include('partials/nav', { page: 'dashboard' }) %>
+
+<main class="main-content">
+  <div class="container">
+
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-sub">All your links in one place.</p>
+      </div>
+      <a href="/links/new" class="btn btn-primary">New Link</a>
+    </div>
+
+    <% if (query && query.created) { %>
+    <div class="alert-created">
+      <div class="alert-created-info">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <div>
+          <span style="font-weight:600;color:#166534">Link created successfully!</span>
+          <div style="font-size:0.8125rem;color:#15803d;margin-top:2px">
+            Short URL: <code style="background:#dcfce7;border-color:#bbf7d0">/<%= query.created %></code>
+          </div>
+        </div>
+      </div>
+      <div class="alert-created-actions">
+        <button type="button" class="btn btn-sm btn-ghost" style="background:#fff" onclick="copyLink('<%= query.created %>', this)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-right:4px"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy Link
+        </button>
+        <button type="button" class="btn btn-sm btn-primary" onclick="openShareModal('<%= query.created %>')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-right:4px"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share Link
+        </button>
+      </div>
+    </div>
+    <% } %>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value"><%= links.length %></div>
+        <div class="stat-label">Total Links</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value"><%= links.filter(l => l.status === 'active').length %></div>
+        <div class="stat-label">Active</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value"><%= links.reduce((s,l) => s + l.currentClicks, 0) %></div>
+        <div class="stat-label">Total Clicks</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value"><%= campaigns.length %></div>
+        <div class="stat-label">Campaigns</div>
+      </div>
+    </div>
+
+    <!-- Links -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">Links</h2>
+        <input
+          type="text"
+          id="linkSearch"
+          class="input-sm"
+          placeholder="Search links…"
+          oninput="filterLinks(this.value)"
+        >
+      </div>
+
+      <% if (links.length === 0) { %>
+        <div class="empty-state">
+          <p>No links yet. <a href="/links/new">Create your first link →</a></p>
+        </div>
+      <% } else { %>
+      <div class="table-wrap">
+        <table class="table" id="linksTable">
+          <thead>
+            <tr>
+              <th>Short URL</th>
+              <th>Title / Destination</th>
+              <th>Campaign</th>
+              <th style="text-align:right">Clicks</th>
+              <th>Status</th>
+              <th>Expires</th>
+              <th style="text-align:right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% links.forEach(link => {
+              const campaign = campaigns.find(c => c.id === link.campaignId);
+            %>
+            <tr data-q="<%= (link.title + link.shortCode + link.originalUrl).toLowerCase() %>">
+              <td>
+                <a href="/<%= link.shortCode %>" target="_blank" class="code-link">/<%= link.shortCode %></a>
+              </td>
+              <td>
+                <div class="link-title"><%= link.title %></div>
+                <div class="link-dest"><%= link.originalUrl %></div>
+              </td>
+              <td>
+                <% if (campaign) { %>
+                  <span class="tag"><%= campaign.name %></span>
+                <% } else { %>
+                  <span class="muted">—</span>
+                <% } %>
+              </td>
+              <td style="text-align:right">
+                <strong><%= link.currentClicks %></strong><% if (link.maxClicks) { %><span class="muted" style="font-size:0.775rem"> / <%= link.maxClicks %></span><% } %>
+              </td>
+              <td><span class="badge badge-<%= link.status %>"><%= link.status %></span></td>
+              <td style="font-size:0.8125rem">
+                <% if (link.expiresAt) { %>
+                  <%= new Date(link.expiresAt).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}) %>
+                <% } else { %>
+                  <span class="muted">Never</span>
+                <% } %>
+              </td>
+              <td style="text-align:right">
+                <div class="actions-cell">
+                  <button type="button" class="btn-action" title="Copy Short Link" onclick="copyLink('<%= link.shortCode %>', this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  </button>
+                  <button type="button" class="btn-action" title="Share Link &amp; QR" onclick="openShareModal('<%= link.shortCode %>', '<%= (link.title || '').replace(/'/g, "\\'") %>', '<%= (link.originalUrl || '').replace(/'/g, "\\'") %>')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                  </button>
+                  <form method="POST" action="/links/<%= link.shortCode %>/delete" onsubmit="return confirm('Delete this link?')" style="margin:0;display:inline-flex">
+                    <button type="submit" class="btn-action" title="Delete" style="color:var(--text-3)">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+      <% } %>
+    </div>
+
+  </div>
+</main>
+
+<%- include('partials/share-modal') %>
+<%- include('partials/footer') %>
+
+<script>
+function filterLinks(q) {
+  document.querySelectorAll('#linksTable tbody tr').forEach(r => {
+    r.style.display = r.dataset.q.includes(q.toLowerCase()) ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>

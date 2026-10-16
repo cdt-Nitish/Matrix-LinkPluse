@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — LinkPulse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+<%- include('partials/nav', { page: 'admin' }) %>
+
+<main class="main-content">
+  <div class="container">
+
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Admin</h1>
+        <p class="page-sub">Kill-switch controls and domain blocklist.</p>
+      </div>
+    </div>
+
+    <!-- All Links -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">All Links</h2>
+        <span class="muted" style="font-size:0.8125rem"><%= links.length %> total</span>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Short URL</th>
+              <th>Destination</th>
+              <th style="text-align:right">Clicks</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% links.forEach(link => { %>
+            <tr>
+              <td><a href="/<%= link.shortCode %>" target="_blank" class="code-link">/<%= link.shortCode %></a></td>
+              <td class="link-dest"><%= link.originalUrl %></td>
+              <td style="text-align:right; font-size:0.875rem"><%= link.currentClicks %></td>
+              <td><span class="badge badge-<%= link.status %>"><%= link.status %></span></td>
+              <td class="muted" style="font-size:0.8125rem">
+                <%= new Date(link.createdAt).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) %>
+              </td>
+              <td>
+                <form method="POST" action="/admin/links/<%= link.shortCode %>/toggle">
+                  <button type="submit" class="btn btn-sm <%= link.status === 'active' ? 'btn-danger' : 'btn-success' %>">
+                    <%= link.status === 'active' ? 'Disable' : 'Enable' %>
+                  </button>
+                </form>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Domain Blocklist -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">Domain Blocklist</h2>
+      </div>
+
+      <div class="card" style="margin-bottom:1rem">
+        <form method="POST" action="/admin/domains/block" class="inline-form">
+          <input type="text" name="domain" class="input" placeholder="e.g. phishing-site.com" required>
+          <input type="text" name="reason" class="input" placeholder="Reason (optional)">
+          <button type="submit" class="btn btn-danger">Block Domain</button>
+        </form>
+      </div>
+
+      <% if (blockedDomains.length === 0) { %>
+        <div class="empty-state"><p>No domains blocked.</p></div>
+      <% } else { %>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr><th>Domain</th><th>Reason</th><th>Blocked</th><th></th></tr>
+          </thead>
+          <tbody>
+            <% blockedDomains.forEach(d => { %>
+            <tr>
+              <td><code><%= d.domain %></code></td>
+              <td style="font-size:0.875rem"><%= d.reason %></td>
+              <td class="muted" style="font-size:0.8125rem">
+                <%= new Date(d.createdAt).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) %>
+              </td>
+              <td>
+                <form method="POST" action="/admin/domains/<%= encodeURIComponent(d.domain) %>/unblock">
+                  <button type="submit" class="btn-icon" title="Unblock">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                </form>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+      <% } %>
+    </div>
+
+  </div>
+</main>
+
+<%- include('partials/footer') %>
+</body>
+</html>

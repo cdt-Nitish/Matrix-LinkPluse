@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <%
+    const titles = { '404': 'Not Found', expired: 'Link Expired', limit: 'Limit Reached', disabled: 'Link Disabled' };
+  %>
+  <title><%= titles[type] || 'Error' %> — LinkPulse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+<%- include('partials/nav', { page: '' }) %>
+
+<main class="main-content">
+  <div class="container container-xs">
+    <div class="center-card">
+      <%
+        const icons  = { '404': '🔍', expired: '⏳', limit: '🛑', disabled: '🚫' };
+      %>
+      <div class="icon-lg"><%= icons[type] || '⚠️' %></div>
+      <h1 class="page-title"><%= titles[type] || 'Something went wrong' %></h1>
+      <p class="page-sub"><%= message %></p>
+      <a href="/" class="btn btn-primary">← Back to Dashboard</a>
+    </div>
+  </div>
+</main>
+
+<%- include('partials/footer') %>
+</body>
+</html>

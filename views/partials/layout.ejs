@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %> — LinkPulse</title>
+  <meta name="description" content="<%= desc || 'LinkPulse: High-speed URL governance, routing and analytics engine.' %>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  <%- typeof extraHead !== 'undefined' ? extraHead : '' %>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="logo">
+        <span class="logo-dot"></span>
+        LinkPulse
+      </a>
+      <nav class="site-nav">
+        <a href="/" class="nav-link <%= page === 'dashboard' ? 'active' : '' %>">Dashboard</a>
+        <a href="/analytics" class="nav-link <%= page === 'analytics' ? 'active' : '' %>">Analytics</a>
+        <a href="/campaigns" class="nav-link <%= page === 'campaigns' ? 'active' : '' %>">Campaigns</a>
+        <a href="/admin" class="nav-link <%= page === 'admin' ? 'active' : '' %>">Admin</a>
+        <a href="/links/new" class="btn btn-primary">+ New Link</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <%- body %>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>LinkPulse &mdash; URL Governance &amp; Analytics Engine &bull; Tech Geeks Hackathon 2026</p>
+    </div>
+  </footer>
+</body>
+</html>
