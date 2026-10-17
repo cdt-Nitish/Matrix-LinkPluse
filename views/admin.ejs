@@ -43,7 +43,17 @@
           <tbody>
             <% links.forEach(link => { %>
             <tr>
-              <td><a href="/<%= link.shortCode %>" target="_blank" class="code-link">/<%= link.shortCode %></a></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <a href="/<%= link.shortCode %>" target="_blank" class="code-link">/<%= link.shortCode %></a>
+                  <button type="button" class="btn-action" title="Copy Short Link" onclick="copyLink('<%= link.shortCode %>', this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  </button>
+                  <button type="button" class="btn-action" title="Share Link &amp; QR" onclick="openShareModal('<%= link.shortCode %>', '<%= encodeURIComponent(link.title || '') %>', '<%= encodeURIComponent(link.originalUrl || '') %>')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                  </button>
+                </div>
+              </td>
               <td class="link-dest"><%= link.originalUrl %></td>
               <td style="text-align:right; font-size:0.875rem"><%= link.currentClicks %></td>
               <td><span class="badge badge-<%= link.status %>"><%= link.status %></span></td>
@@ -51,11 +61,19 @@
                 <%= new Date(link.createdAt).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) %>
               </td>
               <td>
-                <form method="POST" action="/admin/links/<%= link.shortCode %>/toggle">
-                  <button type="submit" class="btn btn-sm <%= link.status === 'active' ? 'btn-danger' : 'btn-success' %>">
-                    <%= link.status === 'active' ? 'Disable' : 'Enable' %>
-                  </button>
-                </form>
+                <div style="display:inline-flex;align-items:center;gap:6px">
+                  <form method="POST" action="/admin/links/<%= link.shortCode %>/toggle" style="margin:0">
+                    <button type="submit" class="btn btn-sm <%= link.status === 'active' ? 'btn-danger' : 'btn-success' %>">
+                      <%= link.status === 'active' ? 'Disable' : 'Enable' %>
+                    </button>
+                  </form>
+                  <form method="POST" action="/admin/links/<%= link.shortCode %>/delete" onsubmit="return confirm('Permanently delete /<%= link.shortCode %>? This action cannot be undone.')" style="margin:0">
+                    <button type="submit" class="btn btn-sm btn-ghost" style="color:var(--red);border-color:#fecaca;background:#fff;" title="Delete link">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-right:3px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                      Delete
+                    </button>
+                  </form>
+                </div>
               </td>
             </tr>
             <% }) %>
@@ -112,6 +130,7 @@
   </div>
 </main>
 
+<%- include('partials/share-modal') %>
 <%- include('partials/footer') %>
 </body>
 </html>

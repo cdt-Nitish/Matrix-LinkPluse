@@ -20,6 +20,19 @@ router.post('/links/:code/toggle', (req, res) => {
   res.redirect('/admin');
 });
 
+// ── Delete link (Admin) ───────────────────────────────────────────────────────
+router.post('/links/:code/delete', (req, res) => {
+  const code = req.params.code;
+  links.delete(code);
+  // Also clean up any clicks associated with this link
+  for (let i = clicks.length - 1; i >= 0; i--) {
+    if (clicks[i].linkId === code) {
+      clicks.splice(i, 1);
+    }
+  }
+  res.redirect('/admin');
+});
+
 // ── Block domain ─────────────────────────────────────────────────────────────
 router.post('/domains/block', (req, res) => {
   const { domain, reason } = req.body;

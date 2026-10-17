@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { links, campaigns, generateShortCode } = require('../data/store');
+const { links, campaigns, clicks, generateShortCode } = require('../data/store');
 
 // ── Home / Dashboard ────────────────────────────────────────────────────────
 router.get('/', (req, res) => {
@@ -92,7 +92,22 @@ router.post('/links/publish', (req, res) => {
 
 // ── Delete link ─────────────────────────────────────────────────────────────
 router.post('/links/:code/delete', (req, res) => {
-  links.delete(req.params.code);
+  const code = req.params.code;
+  links.delete(code);
+  for (let i = clicks.length - 1; i >= 0; i--) {
+    if (clicks[i].linkId === code) {
+      clicks.splice(i, 1);
+    }
+  }
+  res.redirect('/?deleted=1');
+});
+
+// ── Toggle link status (enable / disable) ────────────────────────────────────
+router.post('/links/:code/toggle', (req, res) => {
+  const link = links.get(req.params.code);
+  if (link) {
+    link.status = link.status === 'active' ? 'disabled' : 'active';
+  }
   res.redirect('/');
 });
 

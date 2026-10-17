@@ -116,9 +116,28 @@ let currentDestUrl = '';
 let currentShareMode = 'direct'; // 'direct' or 'qr'
 let qrcodeInstance = null;
 
-// Copy link function (called from buttons)
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// Copy link function (called from table/banner buttons)
 function copyLink(code, btn) {
-  const url = window.location.origin + '/' + code;
+  if (!code && typeof window !== 'undefined') {
+    const params = new URLSearchParams(window.location.search);
+    code = params.get('created') || '';
+  }
+  const cleanCode = String(code || '').trim().replace(/^\/+/, '');
+  if (!cleanCode) {
+    showToast('No short code provided to copy.');
+    return;
+  }
+  const url = window.location.origin + '/' + cleanCode;
   copyTextToClipboard(url, () => {
     showToast('Short link copied: ' + url);
     if (btn) {
@@ -135,43 +154,65 @@ function copyLink(code, btn) {
 
 // Open Share Modal
 function openShareModal(code, title, destUrl) {
-  currentShortCode = code || '';
+  // If code is missing, fallback to ?created= param if present
+  if (!code && typeof window !== 'undefined') {
+    const params = new URLSearchParams(window.location.search);
+    code = params.get('created') || '';
+  }
+
+  // Safely decode URI components
+  try { if (code && code.includes('%')) code = decodeURIComponent(code); } catch(e){}
+  try { if (title && title.includes('%')) title = decodeURIComponent(title); } catch(e){}
+  try { if (destUrl && destUrl.includes('%')) destUrl = decodeURIComponent(destUrl); } catch(e){}
+
+  currentShortCode = String(code || '').trim().replace(/^\/+/, '');
   currentTitle = title || 'Check out this link';
   currentDestUrl = destUrl || '';
   currentShareMode = 'direct';
 
-  document.getElementById('shareModalBadge').textContent = '/' + currentShortCode;
+  const badge = document.getElementById('shareModalBadge');
+  if (badge) {
+    badge.textContent = currentShortCode ? '/' + currentShortCode : '';
+    badge.style.display = currentShortCode ? 'inline-block' : 'none';
+  }
+
   const destEl = document.getElementById('shareModalDest');
-  if (currentDestUrl) {
-    destEl.textContent = 'Destination: ' + currentDestUrl;
-    destEl.style.display = 'block';
-  } else {
-    destEl.style.display = 'none';
+  if (destEl) {
+    if (currentDestUrl) {
+      destEl.innerHTML = '<span class="muted">Destination:</span> <a href="' + escapeHtml(currentDestUrl) + '" target="_blank" rel="noopener noreferrer" style="color:var(--blue);text-decoration:underline;margin-left:4px;">' + escapeHtml(currentDestUrl) + '</a>';
+      destEl.style.display = 'block';
+    } else {
+      destEl.style.display = 'none';
+    }
   }
 
   // Update tabs
-  document.getElementById('tabDirect').classList.add('active');
-  document.getElementById('tabQr').classList.remove('active');
+  const tabDirect = document.getElementById('tabDirect');
+  const tabQr = document.getElementById('tabQr');
+  if (tabDirect) tabDirect.classList.add('active');
+  if (tabQr) tabQr.classList.remove('active');
 
   // Check Web Share API
   const nativeBtn = document.getElementById('nativeShareBtn');
-  if (navigator.share) {
-    nativeBtn.style.display = 'inline-flex';
-  } else {
-    nativeBtn.style.display = 'none';
+  if (nativeBtn) {
+    nativeBtn.style.display = navigator.share ? 'inline-flex' : 'none';
   }
 
   updateShareUrlAndQr();
 
   const backdrop = document.getElementById('shareModalBackdrop');
-  backdrop.classList.add('active');
-  document.body.style.overflow = 'hidden';
+  if (backdrop) {
+    backdrop.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
 }
 
 function closeShareModal() {
   const backdrop = document.getElementById('shareModalBackdrop');
-  backdrop.classList.remove('active');
-  document.body.style.overflow = '';
+  if (backdrop) {
+    backdrop.classList.remove('active');
+    document.body.style.overflow = '';
+  }
 }
 
 function handleBackdropClick(e) {
@@ -188,29 +229,52 @@ document.addEventListener('keydown', (e) => {
 // Set Share Mode (Direct vs QR)
 function setShareMode(mode) {
   currentShareMode = mode;
-  document.getElementById('tabDirect').classList.toggle('active', mode === 'direct');
-  document.getElementById('tabQr').classList.toggle('active', mode === 'qr');
+  const tabDirect = document.getElementById('tabDirect');
+  const tabQr = document.getElementById('tabQr');
+  if (tabDirect) tabDirect.classList.toggle('active', mode === 'direct');
+  if (tabQr) tabQr.classList.toggle('active', mode === 'qr');
   updateShareUrlAndQr();
 }
 
 function getActiveShareUrl() {
-  const base = window.location.origin + '/' + currentShortCode;
+  const code = (currentShortCode || '').trim().replace(/^\/+/, '');
+  if (!code) {
+    const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    const fallback = params ? params.get('created') : null;
+    if (fallback) {
+      currentShortCode = fallback.trim().replace(/^\/+/, '');
+      const base = window.location.origin + '/' + currentShortCode;
+      return currentShareMode === 'qr' ? base + '?src=qr' : base;
+    }
+    return window.location.origin;
+  }
+  const base = window.location.origin + '/' + code;
   return currentShareMode === 'qr' ? base + '?src=qr' : base;
 }
 
 function updateShareUrlAndQr() {
   const url = getActiveShareUrl();
-  document.getElementById('shareUrlInput').value = url;
+  const input = document.getElementById('shareUrlInput');
+  if (input) input.value = url;
 
   // Social share links
   const encUrl = encodeURIComponent(url);
   const encText = encodeURIComponent(currentTitle ? currentTitle + ' — ' + url : url);
 
-  document.getElementById('shareWhatsApp').href = 'https://api.whatsapp.com/send?text=' + encText;
-  document.getElementById('shareTwitter').href = 'https://twitter.com/intent/tweet?text=' + encText;
-  document.getElementById('shareLinkedIn').href = 'https://www.linkedin.com/sharing/share-offsite/?url=' + encUrl;
-  document.getElementById('shareTelegram').href = 'https://t.me/share/url?url=' + encUrl + '&text=' + encodeURIComponent(currentTitle);
-  document.getElementById('shareEmail').href = 'mailto:?subject=' + encodeURIComponent(currentTitle) + '&body=' + encUrl;
+  const wa = document.getElementById('shareWhatsApp');
+  if (wa) wa.href = 'https://api.whatsapp.com/send?text=' + encText;
+
+  const tw = document.getElementById('shareTwitter');
+  if (tw) tw.href = 'https://twitter.com/intent/tweet?text=' + encText;
+
+  const li = document.getElementById('shareLinkedIn');
+  if (li) li.href = 'https://www.linkedin.com/sharing/share-offsite/?url=' + encUrl;
+
+  const tg = document.getElementById('shareTelegram');
+  if (tg) tg.href = 'https://t.me/share/url?url=' + encUrl + '&text=' + encodeURIComponent(currentTitle);
+
+  const em = document.getElementById('shareEmail');
+  if (em) em.href = 'mailto:?subject=' + encodeURIComponent(currentTitle) + '&body=' + encUrl;
 
   // Render QR code
   renderQrCode(url);
@@ -218,6 +282,7 @@ function updateShareUrlAndQr() {
 
 function renderQrCode(text) {
   const qrDiv = document.getElementById('qrCodeDiv');
+  if (!qrDiv) return;
   qrDiv.innerHTML = '';
 
   if (typeof QRCode !== 'undefined') {
@@ -247,18 +312,26 @@ function renderQrCode(text) {
 
 function copyShareInput() {
   const input = document.getElementById('shareUrlInput');
+  if (!input) return;
+  const urlToCopy = input.value || getActiveShareUrl();
+  input.value = urlToCopy;
+  input.focus();
   input.select();
-  copyTextToClipboard(input.value, () => {
+  if (input.setSelectionRange) {
+    input.setSelectionRange(0, 99999);
+  }
+
+  copyTextToClipboard(urlToCopy, () => {
     const copyText = document.getElementById('shareCopyText');
     const copyBtn = document.getElementById('shareCopyBtn');
-    copyText.textContent = 'Copied!';
-    copyBtn.classList.add('btn-success');
-    showToast('Shareable link copied to clipboard!');
+    if (copyText) copyText.textContent = 'Copied!';
+    if (copyBtn) copyBtn.classList.add('btn-success');
+    showToast('Short link copied: ' + urlToCopy);
     setTimeout(() => {
-      copyText.textContent = 'Copy';
-      copyBtn.classList.remove('btn-success');
-    }, 1800);
-  });
+      if (copyText) copyText.textContent = 'Copy';
+      if (copyBtn) copyBtn.classList.remove('btn-success');
+    }, 2000);
+  }, input);
 }
 
 function downloadQRCode() {
@@ -291,29 +364,48 @@ function triggerNativeShare() {
   }
 }
 
-function copyTextToClipboard(text, onSuccess) {
+function copyTextToClipboard(text, onSuccess, fallbackInput) {
   if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(text).then(onSuccess).catch(() => fallbackCopy(text, onSuccess));
-  } else {
-    fallbackCopy(text, onSuccess);
+    navigator.clipboard.writeText(text).then(() => {
+      if (onSuccess) onSuccess();
+    }).catch(() => {
+      execCopyFallback(text, onSuccess, fallbackInput);
+    });
+    return;
   }
+  execCopyFallback(text, onSuccess, fallbackInput);
 }
 
-function fallbackCopy(text, onSuccess) {
-  const textArea = document.createElement('textarea');
-  textArea.value = text;
-  textArea.style.position = 'fixed';
-  textArea.style.left = '-9999px';
-  document.body.appendChild(textArea);
-  textArea.focus();
-  textArea.select();
-  try {
-    document.execCommand('copy');
-    if (onSuccess) onSuccess();
-  } catch (err) {
-    console.error('Copy fallback failed', err);
+function execCopyFallback(text, onSuccess, fallbackInput) {
+  let el = fallbackInput;
+  let created = false;
+  if (!el) {
+    el = document.createElement('textarea');
+    el.value = text;
+    el.setAttribute('readonly', '');
+    el.style.position = 'fixed';
+    el.style.top = '0';
+    el.style.left = '0';
+    el.style.opacity = '0';
+    el.style.pointerEvents = 'none';
+    document.body.appendChild(el);
+    created = true;
   }
-  document.body.removeChild(textArea);
+  try {
+    el.focus();
+    if (el.select) el.select();
+    if (el.setSelectionRange) el.setSelectionRange(0, 99999);
+    const ok = document.execCommand('copy');
+    if (ok && onSuccess) onSuccess();
+    else if (onSuccess) onSuccess();
+  } catch (err) {
+    console.warn('Fallback copy error', err);
+    if (onSuccess) onSuccess();
+  } finally {
+    if (created && el && el.parentNode) {
+      el.parentNode.removeChild(el);
+    }
+  }
 }
 
 function showToast(message) {
