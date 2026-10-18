@@ -7,11 +7,31 @@
       LinkPulse
     </a>
     <div class="nav-links">
-      <a href="/" class="nav-link <%= page === 'dashboard' ? 'active' : '' %>">Dashboard</a>
-      <a href="/analytics" class="nav-link <%= page === 'analytics' ? 'active' : '' %>">Analytics</a>
-      <a href="/campaigns" class="nav-link <%= page === 'campaigns' ? 'active' : '' %>">Campaigns</a>
-      <a href="/admin" class="nav-link <%= page === 'admin'     ? 'active' : '' %>">Admin</a>
-      <a href="/links/new" class="btn btn-primary" style="margin-left:0.5rem;">New Link</a>
+      <a href="/" class="nav-link <%= typeof page !== 'undefined' && page === 'dashboard' ? 'active' : '' %>">Dashboard</a>
+      <a href="/analytics" class="nav-link <%= typeof page !== 'undefined' && page === 'analytics' ? 'active' : '' %>">Analytics</a>
+      <a href="/campaigns" class="nav-link <%= typeof page !== 'undefined' && page === 'campaigns' ? 'active' : '' %>">Campaigns</a>
+      <a href="/admin" class="nav-link <%= typeof page !== 'undefined' && page === 'admin'     ? 'active' : '' %>">Admin</a>
+
+      <div class="nav-divider"></div>
+
+      <% if (typeof user !== 'undefined' && user) { %>
+        <a href="/profile" class="nav-user-pill <%= typeof page !== 'undefined' && page === 'profile' ? 'active' : '' %>" title="Signed in as <%= user.fullName || user.email %>">
+          <span class="user-avatar-badge"><%= (user.fullName ? user.fullName[0] : (user.username ? user.username[0] : 'U')).toUpperCase() %></span>
+          <span class="nav-user-name"><%= user.fullName ? user.fullName.split(' ')[0] : user.username %></span>
+          <% if (user.role) { %>
+            <span class="user-role-badge"><%= user.role %></span>
+          <% } %>
+        </a>
+        <a href="/logout" class="nav-link nav-logout-link" title="Log Out">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:3px;vertical-align:-1px"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Logout
+        </a>
+      <% } else { %>
+        <a href="/login" class="nav-link <%= typeof page !== 'undefined' && page === 'login' ? 'active' : '' %>">Log In</a>
+        <a href="/signup" class="btn btn-ghost btn-sm" style="margin-left:0.25rem;">Sign Up</a>
+      <% } %>
+
+      <a href="/links/new" class="btn btn-primary" style="margin-left:0.4rem;">New Link</a>
     </div>
   </div>
 </nav>

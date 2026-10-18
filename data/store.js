@@ -126,6 +126,87 @@ for (let i = 0; i < 80; i++) {
   });
 }
 
+// ── Users ───────────────────────────────────────────────────────────────────
+const bcrypt = require('bcryptjs');
+const users = new Map(); // id -> user object
+
+const defaultPasswordHash = bcrypt.hashSync('password123', 10);
+
+const seedUsers = [
+  {
+    id: 'usr_admin',
+    fullName: 'Alex Morgan',
+    email: 'admin@linkpulse.io',
+    username: 'admin',
+    passwordHash: defaultPasswordHash,
+    role: 'Admin',
+    organization: 'LinkPulse HQ',
+    accountType: 'Enterprise',
+    createdAt: new Date('2026-01-15'),
+  },
+  {
+    id: 'usr_demo',
+    fullName: 'Nitish Joshi',
+    email: 'demo@linkpulse.io',
+    username: 'demo_user',
+    passwordHash: defaultPasswordHash,
+    role: 'Creator',
+    organization: 'Tech Geeks Team',
+    accountType: 'Pro',
+    createdAt: new Date('2026-02-01'),
+  },
+];
+seedUsers.forEach(u => users.set(u.id, u));
+
+function findUserByEmail(email) {
+  if (!email) return null;
+  const normalized = email.trim().toLowerCase();
+  for (const user of users.values()) {
+    if (user.email.toLowerCase() === normalized) return user;
+  }
+  return null;
+}
+
+function findUserByUsername(username) {
+  if (!username) return null;
+  const normalized = username.trim().toLowerCase();
+  for (const user of users.values()) {
+    if (user.username && user.username.toLowerCase() === normalized) return user;
+  }
+  return null;
+}
+
+function findUserByLogin(loginId) {
+  if (!loginId) return null;
+  return findUserByEmail(loginId) || findUserByUsername(loginId);
+}
+
+function findUserById(id) {
+  return users.get(id) || null;
+}
+
+function createUser({ fullName, email, username, password, organization, role, accountType }) {
+  const id = 'usr_' + generateId().toLowerCase();
+  const passwordHash = bcrypt.hashSync(password, 10);
+  const newUser = {
+    id,
+    fullName: fullName.trim(),
+    email: email.trim().toLowerCase(),
+    username: username ? username.trim().toLowerCase() : email.split('@')[0],
+    passwordHash,
+    role: role || 'Member',
+    organization: organization ? organization.trim() : 'Independent',
+    accountType: accountType || 'Pro',
+    createdAt: new Date(),
+  };
+  users.set(id, newUser);
+  return newUser;
+}
+
+function verifyPassword(plainPassword, passwordHash) {
+  return bcrypt.compareSync(plainPassword, passwordHash);
+}
+
 // ── Exports ─────────────────────────────────────────────────────────────────
 
 module.exports = {
@@ -133,6 +214,14 @@ module.exports = {
   clicks,
   campaigns,
   blockedDomains,
+  users,
+  findUserByEmail,
+  findUserByUsername,
+  findUserByLogin,
+  findUserById,
+  createUser,
+  verifyPassword,
   generateShortCode,
   generateId,
 };
+

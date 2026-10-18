@@ -19,10 +19,20 @@
         LinkPulse
       </a>
       <nav class="site-nav">
-        <a href="/" class="nav-link <%= page === 'dashboard' ? 'active' : '' %>">Dashboard</a>
-        <a href="/analytics" class="nav-link <%= page === 'analytics' ? 'active' : '' %>">Analytics</a>
-        <a href="/campaigns" class="nav-link <%= page === 'campaigns' ? 'active' : '' %>">Campaigns</a>
-        <a href="/admin" class="nav-link <%= page === 'admin' ? 'active' : '' %>">Admin</a>
+        <a href="/" class="nav-link <%= typeof page !== 'undefined' && page === 'dashboard' ? 'active' : '' %>">Dashboard</a>
+        <a href="/analytics" class="nav-link <%= typeof page !== 'undefined' && page === 'analytics' ? 'active' : '' %>">Analytics</a>
+        <a href="/campaigns" class="nav-link <%= typeof page !== 'undefined' && page === 'campaigns' ? 'active' : '' %>">Campaigns</a>
+        <a href="/admin" class="nav-link <%= typeof page !== 'undefined' && page === 'admin' ? 'active' : '' %>">Admin</a>
+        <% if (typeof user !== 'undefined' && user) { %>
+          <a href="/profile" class="nav-user-pill <%= typeof page !== 'undefined' && page === 'profile' ? 'active' : '' %>">
+            <span class="user-avatar-badge"><%= (user.fullName ? user.fullName[0] : 'U').toUpperCase() %></span>
+            <span><%= user.fullName ? user.fullName.split(' ')[0] : user.username %></span>
+          </a>
+          <a href="/logout" class="nav-link">Logout</a>
+        <% } else { %>
+          <a href="/login" class="nav-link <%= typeof page !== 'undefined' && page === 'login' ? 'active' : '' %>">Log In</a>
+          <a href="/signup" class="btn btn-ghost btn-sm">Sign Up</a>
+        <% } %>
         <a href="/links/new" class="btn btn-primary">+ New Link</a>
       </nav>
     </div>

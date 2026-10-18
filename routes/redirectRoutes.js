@@ -8,7 +8,6 @@ const { logClick } = require('../utils/clickLogger');
 router.get('/:shortCode', (req, res) => {
   const { shortCode } = req.params;
 
-  // Skip internal routes
   if (['favicon.ico', 'robots.txt'].includes(shortCode)) return res.sendStatus(204);
 
   const link = links.get(shortCode);
@@ -19,7 +18,7 @@ router.get('/:shortCode', (req, res) => {
     });
   }
 
-  // Step 1 — Active status check
+  
   if (link.status !== 'active') {
     return res.render('error-fallback', {
       type: 'disabled',
