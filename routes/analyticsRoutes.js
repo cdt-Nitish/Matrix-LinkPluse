@@ -14,9 +14,6 @@ const COUNTRY_NAMES = {
   JP: { name: 'Japan', flag: '🇯🇵' },
 };
 
-/**
- * Authentication & Role Middleware for Analytics
- */
 const requireUserAuth = (req, res, next) => {
   if (!req.session || !req.session.userId) {
     return res.redirect('/login?redirect=' + encodeURIComponent(req.originalUrl || '/analytics'));
@@ -31,27 +28,21 @@ router.get('/', requireUserAuth, (req, res) => {
   const isAdmin = role === 'admin' || role === 'host';
 
   const rawLinks = Array.from(links.values());
-
-  // Role Scope:
-  // Admin sees all links across platform; Regular user sees strictly their own links
   const targetLinks = isAdmin
     ? rawLinks
     : rawLinks.filter(l => l.userId && l.userId.toString() === currentUserId.toString());
 
   const targetShortCodes = new Set(targetLinks.map(l => l.shortCode));
-
   const targetClicks = isAdmin
     ? clicks
     : clicks.filter(c => targetShortCodes.has(c.linkId));
 
-  // Calculate total clicks aggregated across target links
   const aggregatedClicks = targetLinks.reduce((sum, l) => sum + (l.currentClicks || 0), 0);
   const totalTelemetryEvents = Math.max(aggregatedClicks, targetClicks.length);
 
-  // Clicks over last 7 days (by date)
+  // Last 7 days breakdown
   const last7 = [];
   const today = new Date();
-  
   const fallbackDaily = isAdmin ? [48, 62, 85, 94, 112, 138, 165] : [2, 5, 8, 12, 19, 24, 30];
 
   for (let i = 6; i >= 0; i--) {
@@ -64,58 +55,57 @@ router.get('/', requireUserAuth, (req, res) => {
       return cd.toDateString() === d.toDateString();
     }).length;
 
-    const dayIndex = 6 - i;
     const count = countInStore > 0 
       ? countInStore * (isAdmin ? 12 : 2) 
-      : (targetLinks.length > 0 ? fallbackDaily[dayIndex] : 0);
+      : (targetLinks.length > 0 ? fallbackDaily[6 - i] : 0);
     last7.push({ label, count });
   }
 
-  // Device breakdown
-  const rawDeviceMap = {};
+  // Device telemetry
+  const deviceMap = {};
   targetClicks.forEach(c => {
-    rawDeviceMap[c.deviceType] = (rawDeviceMap[c.deviceType] || 0) + 1;
+    deviceMap[c.deviceType] = (deviceMap[c.deviceType] || 0) + 1;
   });
-  if (Object.keys(rawDeviceMap).length === 0 && targetLinks.length > 0) {
-    rawDeviceMap['Desktop'] = 24;
-    rawDeviceMap['Mobile'] = 16;
-    rawDeviceMap['Tablet'] = 2;
+  if (Object.keys(deviceMap).length === 0 && targetLinks.length > 0) {
+    deviceMap['Desktop'] = 24;
+    deviceMap['Mobile'] = 16;
+    deviceMap['Tablet'] = 2;
   }
 
-  // Browser breakdown
-  const rawBrowserMap = {};
+  // Browser telemetry
+  const browserMap = {};
   targetClicks.forEach(c => {
-    rawBrowserMap[c.browser] = (rawBrowserMap[c.browser] || 0) + 1;
+    browserMap[c.browser] = (browserMap[c.browser] || 0) + 1;
   });
-  if (Object.keys(rawBrowserMap).length === 0 && targetLinks.length > 0) {
-    rawBrowserMap['Chrome'] = 22;
-    rawBrowserMap['Safari'] = 11;
-    rawBrowserMap['Firefox'] = 5;
-    rawBrowserMap['Edge'] = 2;
+  if (Object.keys(browserMap).length === 0 && targetLinks.length > 0) {
+    browserMap['Chrome'] = 22;
+    browserMap['Safari'] = 11;
+    browserMap['Firefox'] = 5;
+    browserMap['Edge'] = 2;
   }
 
-  // Country breakdown
-  const rawCountryMap = {};
+  // Country telemetry
+  const countryMap = {};
   targetClicks.forEach(c => {
-    rawCountryMap[c.country] = (rawCountryMap[c.country] || 0) + 1;
+    countryMap[c.country] = (countryMap[c.country] || 0) + 1;
   });
-  if (Object.keys(rawCountryMap).length === 0 && targetLinks.length > 0) {
-    rawCountryMap['US'] = 15;
-    rawCountryMap['IN'] = 14;
-    rawCountryMap['GB'] = 7;
-    rawCountryMap['DE'] = 4;
-    rawCountryMap['SG'] = 2;
+  if (Object.keys(countryMap).length === 0 && targetLinks.length > 0) {
+    countryMap['US'] = 15;
+    countryMap['IN'] = 14;
+    countryMap['GB'] = 7;
+    countryMap['DE'] = 4;
+    countryMap['SG'] = 2;
   }
 
   // Source (QR vs Direct)
-  const rawSourceMap = { qr: 0, direct: 0 };
+  const sourceMap = { qr: 0, direct: 0 };
   targetClicks.forEach(c => { 
-    if (c.source === 'qr') rawSourceMap.qr++;
-    else rawSourceMap.direct++;
+    if (c.source === 'qr') sourceMap.qr++;
+    else sourceMap.direct++;
   });
-  if (rawSourceMap.qr === 0 && rawSourceMap.direct === 0 && targetLinks.length > 0) {
-    rawSourceMap.direct = 28;
-    rawSourceMap.qr = 14;
+  if (sourceMap.qr === 0 && sourceMap.direct === 0 && targetLinks.length > 0) {
+    sourceMap.direct = 28;
+    sourceMap.qr = 14;
   }
 
   // Top links
@@ -123,7 +113,7 @@ router.get('/', requireUserAuth, (req, res) => {
     .sort((a, b) => (b.currentClicks || 0) - (a.currentClicks || 0))
     .slice(0, 6);
 
-  // Recent Live Activity Stream (latest 8 telemetry events)
+  // Live Activity Stream
   const recentEvents = [...targetClicks]
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
     .slice(0, 8)
@@ -143,9 +133,8 @@ router.get('/', requireUserAuth, (req, res) => {
       };
     });
 
-  // Calculate QR Scan percentage
-  const totalScans = rawSourceMap.qr + rawSourceMap.direct;
-  const qrPercent = totalScans > 0 ? Math.round((rawSourceMap.qr / totalScans) * 100) : (targetLinks.length > 0 ? 33 : 0);
+  const totalScans = sourceMap.qr + sourceMap.direct;
+  const qrPercent = totalScans > 0 ? Math.round((sourceMap.qr / totalScans) * 100) : (targetLinks.length > 0 ? 33 : 0);
 
   res.render('analytics', {
     page: 'analytics',
@@ -156,11 +145,11 @@ router.get('/', requireUserAuth, (req, res) => {
     activeLinks: targetLinks.filter(l => l.status === 'active').length,
     qrPercent,
     last7,
-    deviceMap: rawDeviceMap,
-    browserMap: rawBrowserMap,
-    countryMap: rawCountryMap,
+    deviceMap,
+    browserMap,
+    countryMap,
     countryMeta: COUNTRY_NAMES,
-    sourceMap: rawSourceMap,
+    sourceMap,
     topLinks,
     recentEvents,
     user: req.session.user,

@@ -2,9 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { links, blockedDomains, clicks } = require('../data/store');
 
-/**
- * Strict RBAC Middleware: Requires Administrator or Host Role
- */
+// Admin role check middleware
 const requireAdmin = (req, res, next) => {
   if (!req.session || !req.session.userId) {
     return res.redirect('/login?redirect=' + encodeURIComponent(req.originalUrl || '/admin'));
@@ -25,25 +23,23 @@ const requireAdmin = (req, res, next) => {
   });
 };
 
-// Apply requireAdmin to all routes in this router
 router.use(requireAdmin);
 
-// ── Admin Panel ──────────────────────────────────────────────────────────────
+// Admin dashboard
 router.get('/', (req, res) => {
   const allLinks = Array.from(links.values()).sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   );
-  const allDomains = Array.from(blockedDomains.values());
   res.render('admin', {
     page: 'admin',
     links: allLinks,
-    blockedDomains: allDomains,
+    blockedDomains: Array.from(blockedDomains.values()),
     message: null,
     user: req.session.user,
   });
 });
 
-// ── Toggle link status (Kill-Switch) ─────────────────────────────────────────
+// Toggle link kill-switch
 router.post('/links/:code/toggle', (req, res) => {
   const link = links.get(req.params.code);
   if (link) {
@@ -52,11 +48,10 @@ router.post('/links/:code/toggle', (req, res) => {
   res.redirect('/admin');
 });
 
-// ── Delete link (Admin) ───────────────────────────────────────────────────────
+// Delete link
 router.post('/links/:code/delete', (req, res) => {
   const code = req.params.code;
   links.delete(code);
-  // Also clean up any clicks associated with this link
   for (let i = clicks.length - 1; i >= 0; i--) {
     if (clicks[i].linkId === code) {
       clicks.splice(i, 1);
@@ -65,7 +60,7 @@ router.post('/links/:code/delete', (req, res) => {
   res.redirect('/admin');
 });
 
-// ── Block domain ─────────────────────────────────────────────────────────────
+// Block domain
 router.post('/domains/block', (req, res) => {
   const { domain, reason } = req.body;
   if (domain) {
@@ -78,7 +73,7 @@ router.post('/domains/block', (req, res) => {
   res.redirect('/admin');
 });
 
-// ── Unblock domain ───────────────────────────────────────────────────────────
+// Unblock domain
 router.post('/domains/:domain/unblock', (req, res) => {
   blockedDomains.delete(req.params.domain);
   res.redirect('/admin');
