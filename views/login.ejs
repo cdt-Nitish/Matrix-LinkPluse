@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title><%= title %> — LinkPulse</title>
-  <meta name="description" content="Sign in to your LinkPulse account to manage links, analytics, and campaigns.">
+  <title><%= typeof title !== 'undefined' ? title : (typeof pageTitle !== 'undefined' ? pageTitle : 'Sign In') %> — LinkPulse</title>
+  <meta name="description" content="Sign in to your LinkPulse workspace.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
@@ -15,74 +15,115 @@
 <%- include('partials/nav', { page: 'login' }) %>
 
 <main class="main-content">
-  <div class="container auth-page-wrap">
-    <div class="auth-card">
-      
-      <div class="auth-header">
-        <div class="auth-logo-badge">
-          <svg viewBox="0 0 24 24"><polyline points="13 2 13 9 20 9"/><path d="M20 9L13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/></svg>
-        </div>
-        <h1 class="auth-title">Welcome back</h1>
-        <p class="auth-sub">Enter your credentials to access your links and telemetry.</p>
+  <div class="container container-xs auth-page-container">
+    <div class="auth-box">
+
+      <!-- Switcher Tabs -->
+      <div class="auth-tabs">
+        <a href="/login" class="auth-tab active" id="tabSignIn">Sign In</a>
+        <a href="/signup" class="auth-tab" id="tabSignUp">Create Account</a>
       </div>
 
-      <!-- Quick Demo Access Bar -->
-      <div class="auth-demo-box">
-        <div class="auth-demo-text">
-          <strong>Demo Account:</strong><br>
-          <code>admin@linkpulse.io</code> &bull; <code>password123</code>
+      <div class="auth-box-header">
+        <div class="auth-badge-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="13 2 13 9 20 9"/><path d="M20 9L13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+          </svg>
         </div>
-        <button type="button" class="btn btn-sm btn-ghost" onclick="fillDemo('admin@linkpulse.io', 'password123')">
-          Quick Fill
-        </button>
+        <h1 class="auth-headline">Welcome Back</h1>
+        <p class="auth-subline">Enter your credentials to access your dashboard.</p>
       </div>
 
-      <% if (error) { %>
-      <div class="alert alert-error">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <span><%= error %></span>
+      <!-- Quick Demo Credentials -->
+      <!-- Quick Demo Credentials for Testing Both Roles -->
+      <div class="auth-demo-banner" style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+          <span><strong style="color:#60A5FA;">Admin:</strong> <code>admin@linkpulse.io</code> / <code>password123</code></span>
+          <button type="button" class="btn btn-sm btn-primary" onclick="document.getElementById('email').value='admin@linkpulse.io';document.getElementById('password').value='password123';" id="fillAdminBtn">
+            Fill Admin
+          </button>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;width:100%;border-top:1px solid rgba(255,255,255,0.08);padding-top:6px;">
+          <span><strong style="color:#CBD5E1;">User:</strong> <code>demo@linkpulse.io</code> / <code>password123</code></span>
+          <button type="button" class="btn btn-sm btn-ghost" onclick="document.getElementById('email').value='demo@linkpulse.io';document.getElementById('password').value='password123';" id="fillUserBtn">
+            Fill User
+          </button>
+        </div>
+      </div>
+
+      <!-- Specific Error Display (Checks if Email is wrong or Password is wrong) -->
+      <% 
+        const errList = (typeof errors !== 'undefined' && Array.isArray(errors) && errors.length > 0) 
+          ? errors 
+          : (typeof error !== 'undefined' && error ? [error] : []); 
+      %>
+
+      <% if (errList.length > 0) { %>
+      <div class="alert alert-error" role="alert" id="authErrorAlert">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div class="alert-content">
+          <% errList.forEach(function(msg) { %>
+            <div class="error-msg-item">
+              <% if (msg.toLowerCase().includes('email') || msg.toLowerCase().includes('account') || msg.toLowerCase().includes('username')) { %>
+                <strong>Email Error:</strong> <%= msg %>
+              <% } else if (msg.toLowerCase().includes('password')) { %>
+                <strong>Password Error:</strong> <%= msg %>
+              <% } else { %>
+                <%= msg %>
+              <% } %>
+            </div>
+          <% }); %>
+        </div>
       </div>
       <% } %>
 
-      <% if (success) { %>
-      <div class="alert alert-success">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <% if (typeof success !== 'undefined' && success) { %>
+      <div class="alert alert-success" role="alert">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         <span><%= success %></span>
       </div>
       <% } %>
 
-      <form method="POST" action="/login" id="loginForm">
-        <input type="hidden" name="redirectUrl" value="<%= redirectUrl %>">
+      <!-- Pure Standard HTML Form Submission -->
+      <form method="POST" action="/login" class="auth-form" id="loginForm">
+        <input type="hidden" name="redirectUrl" value="<%= typeof redirectUrl !== 'undefined' ? redirectUrl : '/' %>">
+
+        <% 
+          let filledEmail = '';
+          if (typeof oldInput !== 'undefined' && oldInput) {
+            filledEmail = oldInput.email || oldInput.loginId || '';
+          } else if (typeof loginId !== 'undefined' && loginId) {
+            filledEmail = loginId;
+          }
+        %>
 
         <div class="form-group">
-          <label for="loginId">Email or Username <span class="required">*</span></label>
+          <label for="email">Email or username <span class="required">*</span></label>
           <input 
             type="text" 
-            id="loginId" 
-            name="loginId" 
-            class="input" 
-            placeholder="e.g. admin@linkpulse.io" 
-            value="<%= loginId || '' %>" 
+            id="email" 
+            name="email" 
+            class="input <%= (errList.some(e => e.toLowerCase().includes('email') || e.toLowerCase().includes('account'))) ? 'input-error' : '' %>" 
+            placeholder="admin@linkpulse.io" 
+            value="<%= filledEmail %>" 
             required 
             autofocus 
           />
         </div>
 
         <div class="form-group">
-          <label for="password">Password <span class="required">*</span></label>
-          <div class="input-password-wrap">
-            <input 
-              type="password" 
-              id="password" 
-              name="password" 
-              class="input" 
-              placeholder="Enter your password" 
-              required 
-            />
-            <button type="button" class="password-toggle-btn" id="togglePasswordBtn" title="Toggle visibility" onclick="togglePasswordVisibility('password', this)">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
+          <div class="form-label-row">
+            <label for="password">Password <span class="required">*</span></label>
           </div>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            class="input <%= (errList.some(e => e.toLowerCase().includes('password'))) ? 'input-error' : '' %>" 
+            placeholder="Enter your account password" 
+            value="<%= typeof demoPassword !== 'undefined' ? demoPassword : '' %>"
+            required 
+          />
         </div>
 
         <div class="form-row-between">
@@ -92,45 +133,21 @@
           </label>
         </div>
 
-        <button type="submit" class="btn btn-primary auth-submit-btn">
-          Sign In &rarr;
+        <button type="submit" class="btn btn-primary btn-auth-submit" id="submitLoginBtn">
+          Sign In
         </button>
       </form>
 
-      <div class="auth-footer-prompt">
-        Don't have an account yet? <a href="/signup">Sign up now</a>
+      <div class="auth-switch-prompt">
+        <span>Don't have an account?</span>
+        <a href="/signup" class="auth-link-bold">Create an account &rarr;</a>
       </div>
 
     </div>
   </div>
 </main>
 
-<footer class="site-footer">
-  <div class="container footer-inner">
-    <div class="footer-logo">LinkPulse</div>
-    <div>URL Governance &amp; High-Speed Analytics Engine &bull; 2026</div>
-  </div>
-</footer>
-
-<script>
-  function fillDemo(login, pass) {
-    document.getElementById('loginId').value = login;
-    document.getElementById('password').value = pass;
-    document.getElementById('loginId').focus();
-  }
-
-  function togglePasswordVisibility(fieldId, btn) {
-    const input = document.getElementById(fieldId);
-    if (!input) return;
-    if (input.type === 'password') {
-      input.type = 'text';
-      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
-    } else {
-      input.type = 'password';
-      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
-    }
-  }
-</script>
+<%- include('partials/footer') %>
 
 </body>
 </html>

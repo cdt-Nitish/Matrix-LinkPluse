@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %> — LinkPulse</title>
+  <meta name="description" content="View and manage your LinkPulse workspace profile.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+<%- include('partials/nav', { page: 'profile' }) %>
+
+<main class="main-content">
+  <div class="container container-sm">
+
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Profile</h1>
+        <p class="page-sub">Account credentials, role permissions, and organization details.</p>
+      </div>
+      <a href="/logout" class="btn btn-ghost" style="color:var(--red);">
+        Sign Out
+      </a>
+    </div>
+
+    <div class="card profile-box">
+      <div class="profile-header-banner">
+        <div class="profile-avatar-circle">
+          <%= (profileUser.fullName ? profileUser.fullName[0] : (profileUser.username ? profileUser.username[0] : 'U')).toUpperCase() %>
+        </div>
+        <div>
+          <h2 class="profile-name"><%= profileUser.fullName %></h2>
+          <div class="profile-badge-row">
+            <% const pRole = (profileUser.role || profileUser.userType || 'user').toLowerCase(); %>
+            <span class="badge <%= (pRole === 'admin' || pRole === 'host') ? 'badge-admin' : 'badge-user' %>">
+              <%= (pRole === 'admin' || pRole === 'host') ? 'Administrator' : 'Authorised User' %>
+            </span>
+            <span class="tag"><%= profileUser.accountType || (pRole === 'admin' ? 'Enterprise' : 'Pro') %></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-details-grid">
+        <div class="detail-block">
+          <span class="detail-label">Email Address</span>
+          <span class="detail-value"><%= profileUser.email %></span>
+        </div>
+
+        <div class="detail-block">
+          <span class="detail-label">Username</span>
+          <span class="detail-value">@<%= profileUser.username %></span>
+        </div>
+
+        <div class="detail-block">
+          <span class="detail-label">Organization</span>
+          <span class="detail-value"><%= profileUser.organization || 'Independent' %></span>
+        </div>
+
+        <div class="detail-block">
+          <span class="detail-label">Member Since</span>
+          <span class="detail-value">
+            <%= new Date(profileUser.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+          </span>
+        </div>
+
+        <div class="detail-block">
+          <span class="detail-label">User ID</span>
+          <code class="detail-code"><%= profileUser.id %></code>
+        </div>
+
+        <div class="detail-block">
+          <span class="detail-label">Session Status</span>
+          <span style="font-size:0.85rem;color:var(--green);font-weight:500;">Active</span>
+        </div>
+      </div>
+
+      <div class="card-footer-actions">
+        <a href="/" class="btn btn-ghost">&larr; Back to Dashboard</a>
+        <a href="/links/new" class="btn btn-primary">+ Create New Link</a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<%- include('partials/footer') %>
+
+</body>
+</html>

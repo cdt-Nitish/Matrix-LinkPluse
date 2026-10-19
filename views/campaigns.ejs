@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Campaigns — LinkPulse</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
@@ -18,30 +18,36 @@
     <div class="page-header">
       <div>
         <h1 class="page-title">Campaigns</h1>
-        <p class="page-sub">Organise links into campaigns for grouped analytics.</p>
+        <p class="page-sub">Group and organize related links for aggregate performance tracking.</p>
       </div>
     </div>
 
-    <!-- Create campaign -->
-    <div class="card" style="margin-bottom:1.75rem">
+    <!-- Create Campaign Form -->
+    <div class="card" style="margin-bottom:1.5rem">
       <div class="card-title">Create Campaign</div>
-      <form method="POST" action="/campaigns/new" class="inline-form">
-        <input type="text" name="name" class="input" placeholder="Campaign name" required>
-        <input type="text" name="tags" class="input" placeholder="Tags (comma-separated)">
-        <button type="submit" class="btn btn-primary">Create</button>
+      <form method="POST" action="/campaigns/new" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
+        <div style="flex:1;min-width:200px;">
+          <label for="campaignNameInput">Campaign name</label>
+          <input type="text" id="campaignNameInput" name="name" class="input" placeholder="e.g. Q4 Marketing" required>
+        </div>
+        <div style="flex:1;min-width:200px;">
+          <label for="campaignTagsInput">Tags <span class="hint">— comma-separated</span></label>
+          <input type="text" id="campaignTagsInput" name="tags" class="input" placeholder="marketing, launch">
+        </div>
+        <button type="submit" class="btn btn-primary">Create Campaign</button>
       </form>
     </div>
 
-    <!-- Campaigns grid -->
+    <!-- Campaigns Grid -->
     <% if (campaigns.length === 0) { %>
-      <div class="empty-state"><p>No campaigns yet.</p></div>
+      <div class="card" style="text-align:center;padding:2.5rem;"><p class="muted">No campaigns created yet.</p></div>
     <% } else { %>
     <div class="campaign-grid">
       <% campaigns.forEach(c => {
         const cLinks = links.filter(l => l.campaignId === c.id);
         const totalClicks = cLinks.reduce((s, l) => s + l.currentClicks, 0);
       %>
-      <div class="card campaign-card">
+      <div class="campaign-card">
         <div class="campaign-header">
           <div>
             <div class="campaign-name"><%= c.name %></div>
@@ -58,7 +64,7 @@
             <div class="cstat-key">Links</div>
           </div>
           <div class="cstat">
-            <div class="cstat-val"><%= totalClicks %></div>
+            <div class="cstat-val"><%= totalClicks.toLocaleString() %></div>
             <div class="cstat-key">Total Clicks</div>
           </div>
         </div>

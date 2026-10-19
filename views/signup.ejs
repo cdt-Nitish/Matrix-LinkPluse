@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= typeof title !== 'undefined' ? title : (typeof pageTitle !== 'undefined' ? pageTitle : 'Create Account') %> — LinkPulse</title>
+  <meta name="description" content="Create a new LinkPulse workspace account.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+<%- include('partials/nav', { page: 'signup' }) %>
+
+<main class="main-content">
+  <div class="container container-xs auth-page-container">
+    <div class="auth-box">
+
+      <!-- Switcher Tabs -->
+      <div class="auth-tabs">
+        <a href="/login" class="auth-tab" id="tabSignIn">Sign In</a>
+        <a href="/signup" class="auth-tab active" id="tabSignUp">Create Account</a>
+      </div>
+
+      <div class="auth-box-header">
+        <div class="auth-badge-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="8.5" cy="7" r="4"/>
+            <line x1="20" y1="8" x2="20" y2="14"/>
+            <line x1="23" y1="11" x2="17" y2="11"/>
+          </svg>
+        </div>
+        <h1 class="auth-headline">Create Account</h1>
+        <p class="auth-subline">Join LinkPulse with a secure developer account.</p>
+      </div>
+
+      <!-- Specific Validation Errors Display -->
+      <% 
+        const errList = (typeof errors !== 'undefined' && Array.isArray(errors) && errors.length > 0) 
+          ? errors 
+          : (typeof error !== 'undefined' && error ? [error] : []); 
+      %>
+
+      <% if (errList.length > 0) { %>
+      <div class="alert alert-error" role="alert" id="signupErrorAlert">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div class="alert-content">
+          <div class="alert-title"><strong>Please resolve the following:</strong></div>
+          <ul class="alert-list">
+            <% errList.forEach(function(msg) { %>
+              <li><%= msg %></li>
+            <% }); %>
+          </ul>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Pure Standard HTML Form Submission -->
+      <form method="POST" action="/signup" class="auth-form" id="signupForm" novalidate>
+        
+        <% 
+          const currentInput = (typeof oldInput !== 'undefined' && oldInput) 
+            ? oldInput 
+            : ((typeof formData !== 'undefined' && formData) ? formData : {});
+        %>
+
+        <!-- First & Last Name -->
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="firstName">First name <span class="required">*</span></label>
+            <input 
+              type="text" 
+              id="firstName" 
+              name="firstName" 
+              class="input" 
+              placeholder="Enter your first Name" 
+              value="<%= currentInput.firstName || (currentInput.fullName ? currentInput.fullName.split(' ')[0] : '') %>" 
+              required 
+              autofocus 
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="lastName">Last name <span class="hint">— optional</span></label>
+            <input 
+              type="text" 
+              id="lastName" 
+              name="lastName" 
+              class="input" 
+              placeholder="Enter your last name" 
+              value="<%= currentInput.lastName || (currentInput.fullName ? currentInput.fullName.split(' ').slice(1).join(' ') : '') %>" 
+            />
+          </div>
+        </div>
+
+        <input type="hidden" id="fullName" name="fullName" value="<%= currentInput.fullName || '' %>" />
+
+        <!-- Email Address -->
+        <div class="form-group">
+          <label for="email">Email address <span class="required">*</span></label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            class="input" 
+            placeholder="sample@example.com" 
+            value="<%= currentInput.email || '' %>" 
+            required 
+          />
+        </div>
+
+        <!-- Account Role / User Type Selection -->
+        <div class="form-group">
+          <label for="userType">Account Role <span class="required">*</span></label>
+          <select id="userType" name="userType" class="input">
+            <option value="user" <%= (!currentInput.userType || currentInput.userType === 'user' || currentInput.role === 'user') ? 'selected' : '' %>>Authorised User — Create, shorten and share personal links</option>
+            <option value="admin" <%= (currentInput.userType === 'admin' || currentInput.role === 'admin') ? 'selected' : '' %>>Administrator — Full platform governance, kill-switch &amp; security</option>
+            <option value="host" <%= (currentInput.userType === 'host' || currentInput.role === 'host') ? 'selected' : '' %>>Host — Team links, campaigns &amp; custom domains</option>
+          </select>
+        </div>
+
+        <!-- Password Inputs -->
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="password">Password <span class="required">*</span></label>
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              class="input" 
+              placeholder="Create strong password" 
+              required 
+              autocomplete="new-password"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm password <span class="required">*</span></label>
+            <input 
+              type="password" 
+              id="confirmPassword" 
+              name="confirmPassword" 
+              class="input" 
+              placeholder="Confirm password" 
+              required 
+              autocomplete="new-password"
+            />
+          </div>
+        </div>
+
+        <!-- Live Password Requirements Guide (What user must enter) -->
+        <div class="pwd-rules-container" id="pwdRulesBox">
+          <div class="pwd-rules-heading">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span>Password Must Contain:</span>
+          </div>
+
+          <div class="pwd-rules-grid">
+            <div class="pwd-rule-item" id="req-len">
+              <span class="pwd-rule-dot">●</span>
+              <span>At least <strong>6 characters</strong></span>
+            </div>
+            <div class="pwd-rule-item" id="req-upper">
+              <span class="pwd-rule-dot">●</span>
+              <span>One <strong>uppercase letter</strong> (A-Z)</span>
+            </div>
+            <div class="pwd-rule-item" id="req-lower">
+              <span class="pwd-rule-dot">●</span>
+              <span>One <strong>lowercase letter</strong> (a-z)</span>
+            </div>
+            <div class="pwd-rule-item" id="req-num">
+              <span class="pwd-rule-dot">●</span>
+              <span>One <strong>number</strong> (0-9)</span>
+            </div>
+            <div class="pwd-rule-item" id="req-spec">
+              <span class="pwd-rule-dot">●</span>
+              <span>One <strong>special character</strong> (!@#$%^&*)</span>
+            </div>
+            <div class="pwd-rule-item" id="req-match">
+              <span class="pwd-rule-dot">●</span>
+              <span>Passwords <strong>match</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group terms-group">
+          <label class="form-check">
+            <input type="checkbox" name="terms" id="terms" value="on" checked required>
+            <span>I agree to the Terms of Service &amp; Privacy Policy</span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-auth-submit" id="submitSignupBtn">
+          Create Account
+        </button>
+      </form>
+
+      <div class="auth-switch-prompt">
+        <span>Already have an account?</span>
+        <a href="/login" class="auth-link-bold">Sign in &rarr;</a>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<%- include('partials/footer') %>
+
+<script>
+  (function() {
+    const pwdInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirmPassword');
+    const firstName = document.getElementById('firstName');
+    const lastName = document.getElementById('lastName');
+    const fullName = document.getElementById('fullName');
+
+    function syncFullName() {
+      if (fullName) {
+        fullName.value = ((firstName ? firstName.value : '') + ' ' + (lastName ? lastName.value : '')).trim();
+      }
+    }
+
+    if (firstName) firstName.addEventListener('input', syncFullName);
+    if (lastName) lastName.addEventListener('input', syncFullName);
+
+    const rules = {
+      len: document.getElementById('req-len'),
+      upper: document.getElementById('req-upper'),
+      lower: document.getElementById('req-lower'),
+      num: document.getElementById('req-num'),
+      spec: document.getElementById('req-spec'),
+      match: document.getElementById('req-match')
+    };
+
+    function updateRule(element, isValid) {
+      if (!element) return;
+      if (isValid) {
+        element.classList.add('valid');
+        element.classList.remove('invalid');
+      } else {
+        element.classList.remove('valid');
+      }
+    }
+
+    function checkPassword() {
+      const val = pwdInput ? pwdInput.value : '';
+      const confirmVal = confirmInput ? confirmInput.value : '';
+
+      updateRule(rules.len, val.length >= 6);
+      updateRule(rules.upper, /[A-Z]/.test(val));
+      updateRule(rules.lower, /[a-z]/.test(val));
+      updateRule(rules.num, /[0-9]/.test(val));
+      updateRule(rules.spec, /[\W_]/.test(val));
+      updateRule(rules.match, val.length > 0 && val === confirmVal);
+    }
+
+    if (pwdInput) {
+      pwdInput.addEventListener('input', checkPassword);
+    }
+    if (confirmInput) {
+      confirmInput.addEventListener('input', checkPassword);
+    }
+
+    // Run initial check if pre-filled
+    checkPassword();
+  })();
+</script>
+
+</body>
+</html>

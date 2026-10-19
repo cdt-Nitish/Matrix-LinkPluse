@@ -42,6 +42,7 @@ seedCampaigns.forEach(c => campaigns.set(c.id, c));
 // Links
 const seedLinks = [
   {
+    userId: 'usr_admin',
     shortCode: 'fest26',
     originalUrl: 'https://techgeeksfest.dev/register',
     title: 'Tech Geeks Fest Registration',
@@ -57,6 +58,7 @@ const seedLinks = [
     createdAt: new Date('2026-09-05'),
   },
   {
+    userId: 'usr_admin',
     shortCode: 'launch4',
     originalUrl: 'https://example.com/product-launch',
     title: 'Q4 Product Launch Page',
@@ -72,6 +74,7 @@ const seedLinks = [
     createdAt: new Date('2026-10-02'),
   },
   {
+    userId: 'usr_demo',
     shortCode: 'sale26',
     originalUrl: 'https://shop.example.com/summer-sale',
     title: 'Summer Sale Landing',
@@ -87,6 +90,7 @@ const seedLinks = [
     createdAt: new Date('2026-06-10'),
   },
   {
+    userId: 'usr_demo',
     shortCode: 'secpdf',
     originalUrl: 'https://drive.example.com/secret-report.pdf',
     title: 'Confidential Report',
@@ -139,7 +143,8 @@ const seedUsers = [
     email: 'admin@linkpulse.io',
     username: 'admin',
     passwordHash: defaultPasswordHash,
-    role: 'Admin',
+    role: 'admin',
+    userType: 'admin',
     organization: 'LinkPulse HQ',
     accountType: 'Enterprise',
     createdAt: new Date('2026-01-15'),
@@ -150,7 +155,8 @@ const seedUsers = [
     email: 'demo@linkpulse.io',
     username: 'demo_user',
     passwordHash: defaultPasswordHash,
-    role: 'Creator',
+    role: 'user',
+    userType: 'user',
     organization: 'Tech Geeks Team',
     accountType: 'Pro',
     createdAt: new Date('2026-02-01'),

@@ -4,8 +4,10 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Analytics — LinkPulse</title>
+  <meta name="description" content="Click telemetry, device profiling, and traffic sources.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
@@ -16,92 +18,237 @@
 <main class="main-content">
   <div class="container">
 
-    <div class="page-header">
+    <div class="analytics-header-row">
       <div>
-        <h1 class="page-title">Analytics</h1>
-        <p class="page-sub">Live click telemetry across all links and campaigns.</p>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap;">
+          <h1 class="page-title"><%= typeof isAdmin !== 'undefined' && isAdmin ? 'Platform Telemetry &amp; Analytics' : 'My Link Analytics' %></h1>
+          <% if (typeof isAdmin !== 'undefined' && isAdmin) { %>
+            <span class="badge badge-admin">Admin &bull; Global Telemetry</span>
+          <% } else { %>
+            <span class="badge badge-user">Authorised User &bull; My Links</span>
+          <% } %>
+        </div>
+        <p class="page-sub"><%= typeof isAdmin !== 'undefined' && isAdmin ? 'Platform-wide telemetry across all links, campaigns, and global traffic sources.' : 'Real-time telemetry and audience insights for your shortened links.' %></p>
+      </div>
+
+      <div class="analytics-header-actions">
+        <div class="timeframe-selector">
+          <button type="button" class="timeframe-btn active">7 days</button>
+          <button type="button" class="timeframe-btn">30 days</button>
+          <button type="button" class="timeframe-btn">All time</button>
+        </div>
       </div>
     </div>
 
-    <!-- Stats -->
+    <!-- Flat Statistic Cards -->
     <div class="stats-row">
       <div class="stat-card">
-        <div class="stat-value"><%= totalClicks %></div>
+        <div class="stat-value"><%= totalClicks.toLocaleString() %></div>
         <div class="stat-label">Total Clicks</div>
       </div>
+
       <div class="stat-card">
         <div class="stat-value"><%= totalLinks %></div>
-        <div class="stat-label">Links</div>
+        <div class="stat-label">Managed Links (<%= activeLinks %> active)</div>
       </div>
+
       <div class="stat-card">
-        <div class="stat-value"><%= activeLinks %></div>
-        <div class="stat-label">Active Links</div>
+        <div class="stat-value"><%= sourceMap.qr || 0 %></div>
+        <div class="stat-label">QR Code Scans (<%= qrPercent %>%)</div>
       </div>
+
       <div class="stat-card">
         <div class="stat-value"><%= totalCampaigns %></div>
-        <div class="stat-label">Campaigns</div>
+        <div class="stat-label">Active Campaigns</div>
       </div>
     </div>
 
-    <!-- Charts -->
-    <div class="charts-grid">
-      <div class="card chart-card chart-wide">
-        <div class="card-title">Clicks — Last 7 Days</div>
-        <canvas id="clicksChart" height="90"></canvas>
+    <!-- Main Chart: 7-Day Clicks -->
+    <div class="card chart-card">
+      <div class="chart-header-row">
+        <div>
+          <div class="card-title">Clicks over time</div>
+          <div class="card-subtitle">Daily click volume for the past 7 days</div>
+        </div>
       </div>
-      <div class="card chart-card">
-        <div class="card-title">Device</div>
-        <canvas id="deviceChart" height="160"></canvas>
-      </div>
-      <div class="card chart-card">
-        <div class="card-title">Browser</div>
-        <canvas id="browserChart" height="160"></canvas>
-      </div>
-      <div class="card chart-card">
-        <div class="card-title">QR vs Direct</div>
-        <canvas id="sourceChart" height="160"></canvas>
-      </div>
-      <div class="card chart-card">
-        <div class="card-title">Top Countries</div>
-        <canvas id="countryChart" height="160"></canvas>
+      <div style="height: 240px; position: relative;">
+        <canvas id="clicksHeroChart"></canvas>
       </div>
     </div>
 
-    <!-- Top Links -->
+    <!-- 4 Breakdown Charts -->
+    <div class="analytics-charts-quad">
+      
+      <!-- Device Breakdown -->
+      <div class="card chart-card">
+        <div class="chart-header-row">
+          <div>
+            <div class="card-title">Devices</div>
+            <div class="card-subtitle">Traffic by client device</div>
+          </div>
+        </div>
+        <div style="height: 180px; position: relative;">
+          <canvas id="deviceChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Browser Distribution -->
+      <div class="card chart-card">
+        <div class="chart-header-row">
+          <div>
+            <div class="card-title">Browsers</div>
+            <div class="card-subtitle">User agent engine breakdown</div>
+          </div>
+        </div>
+        <div style="height: 180px; position: relative;">
+          <canvas id="browserChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Traffic Channels -->
+      <div class="card chart-card">
+        <div class="chart-header-row">
+          <div>
+            <div class="card-title">Channels</div>
+            <div class="card-subtitle">Direct redirect vs QR scan</div>
+          </div>
+        </div>
+        <div style="height: 180px; position: relative;">
+          <canvas id="sourceChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Top Countries -->
+      <div class="card chart-card">
+        <div class="chart-header-row">
+          <div>
+            <div class="card-title">Top Countries</div>
+            <div class="card-subtitle">Geographic distribution</div>
+          </div>
+        </div>
+        <div style="height: 180px; position: relative;">
+          <canvas id="countryChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Live Telemetry Stream -->
     <div class="section">
       <div class="section-header">
-        <h2 class="section-title">Top Links by Clicks</h2>
+        <div>
+          <h2 class="section-title">Recent Ingress Activity</h2>
+          <div class="card-subtitle" style="margin-bottom:0;">Latest real-time click and redirection logs</div>
+        </div>
       </div>
+
       <div class="table-wrap">
         <table class="table">
           <thead>
             <tr>
-              <th>#</th>
-              <th>Short URL</th>
+              <th style="width:130px;">Time</th>
+              <th style="width:140px;">Short URL</th>
+              <th>Destination Title</th>
+              <th>Country</th>
+              <th>Device &amp; Browser</th>
+              <th>Source</th>
+              <th style="text-align:right">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (recentEvents && recentEvents.length > 0) { %>
+              <% recentEvents.forEach(evt => { %>
+              <tr>
+                <td class="muted" style="font-size:0.78rem;">
+                  <%= new Date(evt.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) %>
+                </td>
+                <td>
+                  <a href="/<%= evt.shortCode %>" target="_blank" class="code-link">/<%= evt.shortCode %></a>
+                </td>
+                <td style="max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;">
+                  <%= evt.title %>
+                </td>
+                <td>
+                  <span style="font-size:0.82rem;"><%= evt.countryFlag %> <%= evt.countryName %></span>
+                </td>
+                <td>
+                  <span class="muted" style="font-size:0.8rem;"><%= evt.deviceType %> &bull; <%= evt.browser %></span>
+                </td>
+                <td>
+                  <% if (evt.source === 'qr') { %>
+                    <span class="tag" style="color:var(--primary);">QR Scan</span>
+                  <% } else { %>
+                    <span class="tag">Direct</span>
+                  <% } %>
+                </td>
+                <td style="text-align:right;">
+                  <span style="font-size:0.78rem;color:var(--green);font-weight:500;">200 OK</span>
+                </td>
+              </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="7" style="text-align:center;padding:2rem;" class="muted">No recent clicks recorded.</td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Top Performing Links -->
+    <div class="section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Top Performing Links</h2>
+          <div class="card-subtitle" style="margin-bottom:0;">Ranked by total click volume</div>
+        </div>
+        <a href="/" class="btn btn-ghost btn-sm">View all links &rarr;</a>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th style="width:40px;">#</th>
+              <th style="width:160px;">Short URL</th>
               <th>Title</th>
-              <th style="text-align:right">Clicks</th>
-              <th>Status</th>
-              <th style="text-align:right">Actions</th>
+              <th style="text-align:right;width:140px;">Clicks</th>
+              <th style="width:90px;">Status</th>
+              <th style="text-align:right;width:100px;">Actions</th>
             </tr>
           </thead>
           <tbody>
             <% topLinks.forEach((link, i) => { %>
             <tr>
-              <td class="muted" style="font-size:0.8rem"><%= i + 1 %></td>
-              <td><a href="/<%= link.shortCode %>" target="_blank" class="code-link">/<%= link.shortCode %></a></td>
-              <td><%= link.title %></td>
-              <td style="text-align:right">
-                <strong><%= link.currentClicks %></strong>
-                <% if (link.maxClicks) { %><span class="muted" style="font-size:0.775rem"> / <%= link.maxClicks %></span><% } %>
+              <td>
+                <span class="rank-badge"><%= i + 1 %></span>
               </td>
-              <td><span class="badge badge-<%= link.status %>"><%= link.status %></span></td>
+              <td>
+                <a href="/<%= link.shortCode %>" target="_blank" class="code-link">/<%= link.shortCode %></a>
+              </td>
+              <td>
+                <div style="font-weight:500;"><%= link.title %></div>
+              </td>
+              <td style="text-align:right">
+                <span style="font-weight:600;"><%= link.currentClicks.toLocaleString() %></span>
+                <% if (link.maxClicks) { %>
+                  <span class="muted" style="font-size:0.75rem;"> / <%= link.maxClicks %></span>
+                <% } %>
+                <div class="click-progress-track">
+                  <div class="click-progress-fill" style="width: <%= link.maxClicks ? Math.min(100, Math.round((link.currentClicks / link.maxClicks) * 100)) : Math.min(100, Math.round((link.currentClicks / 1000) * 100)) %>%;"></div>
+                </div>
+              </td>
+              <td>
+                <span class="badge badge-<%= link.status %>"><%= link.status %></span>
+              </td>
               <td style="text-align:right">
                 <div class="actions-cell">
                   <button type="button" class="btn-action" title="Copy Short Link" onclick="copyLink('<%= link.shortCode %>', this)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                   </button>
                   <button type="button" class="btn-action" title="Share Link &amp; QR" onclick="openShareModal('<%= link.shortCode %>', '<%= encodeURIComponent(link.title || '') %>', '<%= encodeURIComponent(link.originalUrl || '') %>')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                   </button>
                 </div>
               </td>
@@ -119,83 +266,148 @@
 <%- include('partials/footer') %>
 
 <script>
-Chart.defaults.font.family = 'Inter';
-Chart.defaults.color = '#9a9a92';
+// Clean Minimal Chart.js Configuration
+Chart.defaults.font.family = 'Inter, -apple-system, sans-serif';
+Chart.defaults.color = '#9aa4b2';
+Chart.defaults.borderColor = '#252c38';
 
-const PALETTE = ['#1a1a18', '#6b6b65', '#b0b0a8', '#d8d8d0', '#e8e8e0'];
-const ACCENT_PALETTE = ['#2563eb', '#16a34a', '#dc2626', '#d97706', '#7c3aed'];
+const cleanTooltip = {
+  backgroundColor: '#161b24',
+  titleColor: '#e6edf3',
+  bodyColor: '#9aa4b2',
+  borderColor: '#323b4b',
+  borderWidth: 1,
+  padding: 8,
+  cornerRadius: 4,
+  titleFont: { size: 12, weight: '500' },
+  bodyFont: { size: 11 },
+  boxPadding: 4,
+};
 
-function donut(id, labels, data) {
-  new Chart(document.getElementById(id), {
-    type: 'doughnut',
+// 1. Line Chart (Clicks over time)
+const heroCanvas = document.getElementById('clicksHeroChart');
+if (heroCanvas) {
+  const last7Data = <%- JSON.stringify(last7) %>;
+  new Chart(heroCanvas, {
+    type: 'line',
     data: {
-      labels,
+      labels: last7Data.map(d => d.label),
       datasets: [{
-        data,
-        backgroundColor: ACCENT_PALETTE,
-        borderWidth: 0,
-        hoverOffset: 4,
+        label: 'Clicks',
+        data: last7Data.map(d => d.count),
+        borderColor: '#3b82f6',
+        borderWidth: 2,
+        backgroundColor: 'rgba(59, 130, 246, 0.12)',
+        fill: true,
+        tension: 0.25,
+        pointBackgroundColor: '#3b82f6',
+        pointBorderColor: '#161b24',
+        pointBorderWidth: 1.5,
+        pointRadius: 3.5,
+        pointHoverRadius: 5,
       }]
     },
     options: {
-      cutout: '68%',
+      responsive: true,
+      maintainAspectRatio: false,
       plugins: {
-        legend: {
-          position: 'bottom',
-          labels: { font: { size: 11 }, padding: 12, boxWidth: 10, boxHeight: 10 }
+        legend: { display: false },
+        tooltip: cleanTooltip,
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: { color: '#252c38' },
+          ticks: { color: '#9aa4b2', font: { size: 11 } }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { color: '#9aa4b2', font: { size: 11 } }
         }
       }
     }
   });
 }
 
-// Clicks over time
-new Chart(document.getElementById('clicksChart'), {
-  type: 'bar',
-  data: {
-    labels: <%- JSON.stringify(last7.map(d => d.label)) %>,
-    datasets: [{
-      label: 'Clicks',
-      data: <%- JSON.stringify(last7.map(d => d.count)) %>,
-      backgroundColor: '#1a1a18',
-      borderRadius: 5,
-      borderSkipped: false,
-    }]
-  },
-  options: {
-    plugins: { legend: { display: false } },
-    scales: {
-      y: { beginAtZero: true, grid: { color: '#f0f0ec' }, ticks: { font: { size: 11 } } },
-      x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+// Donut helper
+function renderDonut(id, labels, data, colors) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  new Chart(el, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: colors,
+        borderColor: '#161b24',
+        borderWidth: 1.5,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '70%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { boxWidth: 8, boxHeight: 8, padding: 10, font: { size: 11 }, color: '#9aa4b2' }
+        },
+        tooltip: cleanTooltip,
+      }
     }
-  }
-});
+  });
+}
 
-const dm = <%- JSON.stringify(deviceMap) %>;
-donut('deviceChart', Object.keys(dm), Object.values(dm));
+const PALETTE = ['#3b82f6', '#60a5fa', '#38bdf8', '#818cf8', '#475569'];
 
-const bm = <%- JSON.stringify(browserMap) %>;
-donut('browserChart', Object.keys(bm), Object.values(bm));
+const deviceData = <%- JSON.stringify(deviceMap) %>;
+renderDonut('deviceChart', Object.keys(deviceData), Object.values(deviceData), PALETTE);
 
-const sm = <%- JSON.stringify(sourceMap) %>;
-donut('sourceChart', Object.keys(sm), Object.values(sm));
+const browserData = <%- JSON.stringify(browserMap) %>;
+renderDonut('browserChart', Object.keys(browserData), Object.values(browserData), PALETTE);
 
-const cm = <%- JSON.stringify(countryMap) %>;
-new Chart(document.getElementById('countryChart'), {
-  type: 'bar',
-  data: {
-    labels: Object.keys(cm),
-    datasets: [{ label: 'Clicks', data: Object.values(cm), backgroundColor: '#1a1a18', borderRadius: 4 }]
-  },
-  options: {
-    indexAxis: 'y',
-    plugins: { legend: { display: false } },
-    scales: {
-      x: { beginAtZero: true, grid: { color: '#f0f0ec' }, ticks: { font: { size: 11 } } },
-      y: { grid: { display: false }, ticks: { font: { size: 11 } } },
+const sourceData = <%- JSON.stringify(sourceMap) %>;
+const sourceLabels = Object.keys(sourceData).map(k => k === 'qr' ? 'QR Code' : 'Direct Link');
+renderDonut('sourceChart', sourceLabels, Object.values(sourceData), ['#3b82f6', '#38bdf8']);
+
+// Country bar chart
+const countryData = <%- JSON.stringify(countryMap) %>;
+const countryCanvas = document.getElementById('countryChart');
+if (countryCanvas) {
+  new Chart(countryCanvas, {
+    type: 'bar',
+    data: {
+      labels: Object.keys(countryData),
+      datasets: [{
+        label: 'Clicks',
+        data: Object.values(countryData),
+        backgroundColor: '#3b82f6',
+        borderRadius: 3,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: cleanTooltip,
+      },
+      scales: {
+        x: {
+          beginAtZero: true,
+          grid: { color: '#252c38' },
+          ticks: { color: '#9aa4b2', font: { size: 10 } }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { color: '#9aa4b2', font: { size: 11 } }
+        }
+      }
     }
-  }
-});
+  });
+}
 </script>
 
 </body>

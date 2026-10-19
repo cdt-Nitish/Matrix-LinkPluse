@@ -1,5 +1,17 @@
 const express = require('express');
 const path = require('path');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const { connectDB } = require('./config/db');
+
+// ============================================================================
+// MONGODB CONNECTION URL
+// PASTE YOUR MONGODB PATH / URI HERE:
+// ============================================================================
+const MONGODB_PATH_URL = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/linkpulse';
+
+// Connect to MongoDB using Mongoose
+connectDB();
 
 const linkRoutes = require('./routes/linkRoutes');
 const redirectRoutes = require('./routes/redirectRoutes');
@@ -20,8 +32,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Body & Cookie parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-const cookieParser = require('cookie-parser');
-const session = require('express-session');
 
 app.use(cookieParser());
 app.use(session({
@@ -56,6 +66,11 @@ app.use((req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`LinkPulse running at http://localhost:${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`LinkPulse running at http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
+module.exports.MONGODB_PATH_URL = MONGODB_PATH_URL;
