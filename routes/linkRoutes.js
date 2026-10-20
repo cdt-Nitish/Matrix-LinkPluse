@@ -15,6 +15,9 @@ const requireUserAuth = (req, res, next) => {
   next();
 };
 
+// Dashboard alias
+router.get('/dashboard', (req, res) => res.redirect('/'));
+
 // Home / Landing / Dashboard
 router.get('/', async (req, res) => {
   const currentUser = req.session.user || null;
@@ -88,6 +91,74 @@ router.get('/api/qr', async (req, res) => {
     return res.send(buffer);
   } catch (err) {
     return res.status(500).send('Error generating QR code');
+  }
+});
+
+// Interactive URL Shortener Preview Endpoint
+router.post('/api/shorten-preview', async (req, res) => {
+  try {
+    let { destinationUrl } = req.body;
+    if (!destinationUrl || typeof destinationUrl !== 'string') {
+      return res.status(400).json({ success: false, error: 'Please enter a destination URL.' });
+    }
+    destinationUrl = destinationUrl.trim();
+    if (!/^https?:\/\//i.test(destinationUrl)) {
+      destinationUrl = 'https://' + destinationUrl;
+    }
+    try {
+      new URL(destinationUrl);
+    } catch (e) {
+      return res.status(400).json({ success: false, error: 'Please enter a valid URL (e.g. https://example.com).' });
+    }
+
+    const shortCode = generateShortCode();
+    const currentUserId = (req.session && req.session.userId) ? req.session.userId : 'preview-guest';
+
+    const newLink = {
+      id: shortCode,
+      shortCode,
+      originalUrl: destinationUrl,
+      userId: currentUserId,
+      createdAt: new Date().toISOString(),
+      currentClicks: 0,
+      status: 'active',
+      title: 'Preview Short Link',
+    };
+
+    links.set(shortCode, newLink);
+
+    if (isDbConnected()) {
+      try {
+        await LinkModel.create({
+          shortCode,
+          originalUrl: destinationUrl,
+          userId: currentUserId === 'preview-guest' ? null : currentUserId,
+          status: 'active',
+          title: 'Preview Short Link',
+        });
+      } catch (dbErr) {
+        console.warn('Preview DB save warning:', dbErr.message);
+      }
+    }
+
+    const host = req.get('host') || 'localhost:3000';
+    const protocol = req.protocol || 'http';
+    const fullShortUrl = `${protocol}://${host}/${shortCode}`;
+    const displayUrl = `linkpulse.io/${shortCode}`;
+
+    return res.json({
+      success: true,
+      shortCode,
+      shortUrl: fullShortUrl,
+      displayUrl,
+      originalUrl: destinationUrl,
+      clicks: 0,
+      isGuest: currentUserId === 'preview-guest',
+      message: 'Short link generated successfully!',
+    });
+  } catch (err) {
+    console.error('Shorten preview error:', err);
+    return res.status(500).json({ success: false, error: 'Failed to generate short link. Please try again.' });
   }
 });
 
@@ -267,10 +338,20 @@ router.post('/links/:code/toggle', requireUserAuth, async (req, res) => {
 
 // Campaign Management
 router.get('/campaigns', requireUserAuth, (req, res) => {
+  const currentUser = req.session.user || {};
+  const currentUserId = req.session.userId || currentUser.id;
+  const role = (currentUser.role || currentUser.userType || 'user').toLowerCase();
+  const isAdmin = role === 'admin' || role === 'host';
+
+  const rawLinks = Array.from(links.values());
+  const userLinks = (isAdmin || !currentUserId)
+    ? rawLinks
+    : rawLinks.filter(l => l.userId && l.userId.toString() === currentUserId.toString());
+
   res.render('campaigns', {
     page: 'campaigns',
     campaigns: Array.from(campaigns.values()),
-    links: Array.from(links.values()),
+    links: userLinks,
     user: req.session.user,
   });
 });

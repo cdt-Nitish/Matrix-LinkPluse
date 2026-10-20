@@ -1,61 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title><%= typeof title !== 'undefined' ? title : (typeof pageTitle !== 'undefined' ? pageTitle : 'Create Account') %> — LinkPulse</title>
-  <meta name="description" content="Create a new LinkPulse workspace account.">
+  <meta name="description" content="Create a new LinkPulse developer account.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
+  <%- include('partials/theme-head') %>
 </head>
 <body class="auth-page">
 
-  <!-- Compact Top Header for Auth Pages -->
-  <header class="landing-nav-container">
-    <div class="container">
-      <nav class="landing-navbar">
-        <a href="/" class="landing-brand">
-          <div class="sidebar-logo-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="13 2 13 9 20 9"/>
-              <path d="M20 9L13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
-            </svg>
-          </div>
-          <span>LinkPulse</span>
-        </a>
-        <div>
-          <a href="/" class="btn btn-ghost btn-sm">&larr; Back to Home</a>
-        </div>
-      </nav>
-    </div>
-  </header>
+  <!-- Header and Navigation -->
+  <%- include('partials/auth-header') %>
 
-<main class="main-content">
-  <div class="container container-xs auth-page-container">
-    <div class="auth-box">
+  <!-- Main Centered Authentication Area -->
+  <main class="auth-main-wrapper" id="mainContent">
+    <div class="auth-card" id="authCard">
 
-      <!-- Switcher Tabs -->
-      <div class="auth-tabs">
+      <!-- 1. Tabs -->
+      <nav class="auth-tabs" aria-label="Authentication navigation">
         <a href="/login" class="auth-tab" id="tabSignIn">Sign In</a>
-        <a href="/signup" class="auth-tab active" id="tabSignUp">Create Account</a>
-      </div>
+        <a href="/signup" class="auth-tab active" id="tabSignUp" aria-current="page">Create Account</a>
+      </nav>
 
-      <div class="auth-box-header">
-        <div class="auth-badge-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-            <circle cx="8.5" cy="7" r="4"/>
-            <line x1="20" y1="8" x2="20" y2="14"/>
-            <line x1="23" y1="11" x2="17" y2="11"/>
+      <!-- 2. Blue User Icon -->
+      <div class="auth-icon-wrap" aria-hidden="true">
+        <div class="auth-doc-icon-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="8.5" cy="7" r="4"></circle>
+            <line x1="20" y1="8" x2="20" y2="14"></line>
+            <line x1="23" y1="11" x2="17" y2="11"></line>
           </svg>
         </div>
-        <h1 class="auth-headline">Create Account</h1>
-        <p class="auth-subline">Join LinkPulse with a secure developer account.</p>
       </div>
 
-      <!-- Specific Validation Errors Display -->
+      <!-- 3. Heading and Subtitle -->
+      <header class="auth-header-text">
+        <h1 class="auth-title">Create Account</h1>
+        <p class="auth-desc">Join LinkPulse with a secure developer account.</p>
+      </header>
+
+      <!-- Validation Errors Display -->
       <% 
         const errList = (typeof errors !== 'undefined' && Array.isArray(errors) && errors.length > 0) 
           ? errors 
@@ -63,11 +52,15 @@
       %>
 
       <% if (errList.length > 0) { %>
-      <div class="alert alert-error" role="alert" id="signupErrorAlert">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <div class="alert-content">
+      <div class="auth-alert auth-alert-error" role="alert" id="signupErrorAlert">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:1px;">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <div class="auth-alert-message">
           <div style="font-weight:600;margin-bottom:4px;">Please resolve the following:</div>
-          <ul style="padding-left:1.25rem;margin:0;font-size:0.84rem;">
+          <ul style="padding-left:1.15rem;margin:0;font-size:13px;">
             <% errList.forEach(function(msg) { %>
               <li><%= msg %></li>
             <% }); %>
@@ -76,40 +69,41 @@
       </div>
       <% } %>
 
-      <!-- HTML Form Submission -->
+      <!-- Registration Form -->
       <form method="POST" action="/signup" class="auth-form" id="signupForm" novalidate>
-        
         <% 
           const currentInput = (typeof oldInput !== 'undefined' && oldInput) 
             ? oldInput 
             : ((typeof formData !== 'undefined' && formData) ? formData : {});
         %>
 
-        <!-- First & Last Name -->
+        <!-- First & Last Name (2 columns) -->
         <div class="auth-row-2col">
-          <div class="form-group">
-            <label for="firstName">First name <span class="required">*</span></label>
+          <div class="form-field-group">
+            <label for="firstName" class="form-field-label">First name <span class="required">*</span></label>
             <input 
               type="text" 
               id="firstName" 
               name="firstName" 
-              class="input" 
+              class="form-field-input" 
               placeholder="First name" 
               value="<%= currentInput.firstName || (currentInput.fullName ? currentInput.fullName.split(' ')[0] : '') %>" 
               required 
               autofocus 
+              autocomplete="given-name"
             />
           </div>
 
-          <div class="form-group">
-            <label for="lastName">Last name <span class="hint">— optional</span></label>
+          <div class="form-field-group">
+            <label for="lastName" class="form-field-label">Last name <span class="hint">— optional</span></label>
             <input 
               type="text" 
               id="lastName" 
               name="lastName" 
-              class="input" 
+              class="form-field-input" 
               placeholder="Last name" 
               value="<%= currentInput.lastName || (currentInput.fullName ? currentInput.fullName.split(' ').slice(1).join(' ') : '') %>" 
+              autocomplete="family-name"
             />
           </div>
         </div>
@@ -117,59 +111,90 @@
         <input type="hidden" id="fullName" name="fullName" value="<%= currentInput.fullName || '' %>" />
 
         <!-- Email Address -->
-        <div class="form-group">
-          <label for="email">Email address <span class="required">*</span></label>
+        <div class="form-field-group">
+          <label for="email" class="form-field-label">Email address <span class="required">*</span></label>
           <input 
             type="email" 
             id="email" 
             name="email" 
-            class="input" 
+            class="form-field-input" 
             placeholder="name@company.com" 
             value="<%= currentInput.email || '' %>" 
             required 
+            autocomplete="email"
           />
         </div>
 
         <!-- Account Role Selection -->
-        <div class="form-group">
-          <label for="userType">Account Role <span class="required">*</span></label>
-          <select id="userType" name="userType" class="input">
-            <option value="user" <%= (!currentInput.userType || currentInput.userType === 'user' || currentInput.role === 'user') ? 'selected' : '' %>>Authorised User — Create, shorten and share personal links</option>
-            <option value="admin" <%= (currentInput.userType === 'admin' || currentInput.role === 'admin') ? 'selected' : '' %>>Administrator — Full platform governance, kill-switch &amp; security</option>
-            <option value="host" <%= (currentInput.userType === 'host' || currentInput.role === 'host') ? 'selected' : '' %>>Host — Team links, campaigns &amp; custom domains</option>
+        <div class="form-field-group">
+          <label for="userType" class="form-field-label">Account Role <span class="required">*</span></label>
+          <select id="userType" name="userType" class="form-field-input">
+            <option value="user" <%= (!currentInput.userType || currentInput.userType === 'user' || currentInput.role === 'user') ? 'selected' : '' %>>Authorised User — Personal links and telemetry</option>
+            <option value="admin" <%= (currentInput.userType === 'admin' || currentInput.role === 'admin') ? 'selected' : '' %>>Administrator — Full platform governance &amp; security</option>
+            <option value="host" <%= (currentInput.userType === 'host' || currentInput.role === 'host') ? 'selected' : '' %>>Host — Team workspaces &amp; campaigns</option>
           </select>
         </div>
 
-        <!-- Password Inputs -->
+        <!-- Password Inputs (2 columns, both with visibility toggle) -->
         <div class="auth-row-2col">
-          <div class="form-group">
-            <label for="password">Password <span class="required">*</span></label>
-            <input 
-              type="password" 
-              id="password" 
-              name="password" 
-              class="input" 
-              placeholder="Strong password" 
-              required 
-              autocomplete="new-password"
-            />
+          <div class="form-field-group">
+            <label for="password" class="form-field-label">Password <span class="required">*</span></label>
+            <div class="password-input-wrap">
+              <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                class="form-field-input" 
+                placeholder="Strong password" 
+                required 
+                autocomplete="new-password"
+              />
+              <button 
+                type="button" 
+                class="password-toggle-btn" 
+                id="pwdToggleBtn1"
+                aria-label="Show password" 
+                title="Show password"
+                onclick="togglePasswordVisibility('password', this)"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
           </div>
 
-          <div class="form-group">
-            <label for="confirmPassword">Confirm password <span class="required">*</span></label>
-            <input 
-              type="password" 
-              id="confirmPassword" 
-              name="confirmPassword" 
-              class="input" 
-              placeholder="Confirm password" 
-              required 
-              autocomplete="new-password"
-            />
+          <div class="form-field-group">
+            <label for="confirmPassword" class="form-field-label">Confirm password <span class="required">*</span></label>
+            <div class="password-input-wrap">
+              <input 
+                type="password" 
+                id="confirmPassword" 
+                name="confirmPassword" 
+                class="form-field-input" 
+                placeholder="Confirm password" 
+                required 
+                autocomplete="new-password"
+              />
+              <button 
+                type="button" 
+                class="password-toggle-btn" 
+                id="pwdToggleBtn2"
+                aria-label="Show password" 
+                title="Show password"
+                onclick="togglePasswordVisibility('confirmPassword', this)"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- Live Password Requirements Guide -->
+        <!-- Password Requirements Grid -->
         <div class="pwd-rules-container" id="pwdRulesBox">
           <div class="pwd-rules-heading">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -207,86 +232,126 @@
           </div>
         </div>
 
-        <div class="form-group" style="margin-bottom:1.25rem;">
-          <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-weight:400;color:var(--text-secondary);font-size:0.84rem;">
-            <input type="checkbox" name="terms" id="terms" value="on" checked required style="accent-color:var(--primary);">
-            <span>I agree to the Terms of Service &amp; Privacy Policy</span>
+        <!-- Terms of Service Checkbox -->
+        <div class="auth-remember-row" style="margin-top:16px;margin-bottom:20px;">
+          <input 
+            type="checkbox" 
+            name="terms" 
+            id="terms" 
+            value="on" 
+            class="auth-checkbox"
+            checked 
+            required
+          />
+          <label for="terms" class="auth-checkbox-label">
+            I agree to the Terms of Service &amp; Privacy Policy
           </label>
         </div>
 
-        <button type="submit" class="btn btn-primary" style="width:100%;min-height:42px;font-size:0.95rem;" id="submitSignupBtn">
-          Create Account
+        <!-- Full-Width Create Account Button -->
+        <button 
+          type="submit" 
+          class="btn-auth-submit" 
+          id="submitSignupBtn"
+        >
+          <span class="btn-text">Create Account</span>
         </button>
       </form>
 
-      <div style="text-align:center;margin-top:1.5rem;font-size:0.85rem;color:var(--text-secondary);">
+      <!-- Sign In Link -->
+      <p class="auth-footer-prompt">
         <span>Already have an account?</span>
-        <a href="/login" style="font-weight:600;color:var(--primary);margin-left:4px;">Sign in &rarr;</a>
-      </div>
+        <a href="/login" class="auth-footer-link" id="signInLink">Sign in</a>
+      </p>
 
     </div>
-  </div>
-</main>
+  </main>
 
-<%- include('partials/footer') %>
+  <%- include('partials/footer') %>
 
-<script>
-  (function() {
-    const pwdInput = document.getElementById('password');
-    const confirmInput = document.getElementById('confirmPassword');
-    const firstName = document.getElementById('firstName');
-    const lastName = document.getElementById('lastName');
-    const fullName = document.getElementById('fullName');
+  <!-- Interactive Scripts -->
+  <script>
+    function togglePasswordVisibility(inputId, btn) {
+      var input = document.getElementById(inputId);
+      if (!input) return;
+      var isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
 
-    function syncFullName() {
-      if (fullName) {
-        fullName.value = ((firstName ? firstName.value : '') + ' ' + (lastName ? lastName.value : '')).trim();
+      var eyeSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+      var eyeOffSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+
+      btn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+      btn.setAttribute('title', isPassword ? 'Hide password' : 'Show password');
+      btn.innerHTML = isPassword ? eyeOffSvg : eyeSvg;
+      input.focus();
+    }
+
+    (function() {
+      var pwdInput = document.getElementById('password');
+      var confirmInput = document.getElementById('confirmPassword');
+      var firstName = document.getElementById('firstName');
+      var lastName = document.getElementById('lastName');
+      var fullName = document.getElementById('fullName');
+
+      function syncFullName() {
+        if (fullName) {
+          fullName.value = ((firstName ? firstName.value : '') + ' ' + (lastName ? lastName.value : '')).trim();
+        }
       }
-    }
 
-    if (firstName) firstName.addEventListener('input', syncFullName);
-    if (lastName) lastName.addEventListener('input', syncFullName);
+      if (firstName) firstName.addEventListener('input', syncFullName);
+      if (lastName) lastName.addEventListener('input', syncFullName);
 
-    const rules = {
-      len: document.getElementById('req-len'),
-      upper: document.getElementById('req-upper'),
-      lower: document.getElementById('req-lower'),
-      num: document.getElementById('req-num'),
-      spec: document.getElementById('req-spec'),
-      match: document.getElementById('req-match')
-    };
+      var rules = {
+        len: document.getElementById('req-len'),
+        upper: document.getElementById('req-upper'),
+        lower: document.getElementById('req-lower'),
+        num: document.getElementById('req-num'),
+        spec: document.getElementById('req-spec'),
+        match: document.getElementById('req-match')
+      };
 
-    function updateRule(element, isValid) {
-      if (!element) return;
-      if (isValid) {
-        element.classList.add('valid');
-      } else {
-        element.classList.remove('valid');
+      function updateRule(element, isValid) {
+        if (!element) return;
+        if (isValid) {
+          element.classList.add('valid');
+        } else {
+          element.classList.remove('valid');
+        }
       }
-    }
 
-    function checkPassword() {
-      const val = pwdInput ? pwdInput.value : '';
-      const confirmVal = confirmInput ? confirmInput.value : '';
+      function checkPassword() {
+        var val = pwdInput ? pwdInput.value : '';
+        var confirmVal = confirmInput ? confirmInput.value : '';
 
-      updateRule(rules.len, val.length >= 6);
-      updateRule(rules.upper, /[A-Z]/.test(val));
-      updateRule(rules.lower, /[a-z]/.test(val));
-      updateRule(rules.num, /[0-9]/.test(val));
-      updateRule(rules.spec, /[\W_]/.test(val));
-      updateRule(rules.match, val.length > 0 && val === confirmVal);
-    }
+        updateRule(rules.len, val.length >= 6);
+        updateRule(rules.upper, /[A-Z]/.test(val));
+        updateRule(rules.lower, /[a-z]/.test(val));
+        updateRule(rules.num, /[0-9]/.test(val));
+        updateRule(rules.spec, /[\W_]/.test(val));
+        updateRule(rules.match, val.length > 0 && val === confirmVal);
+      }
 
-    if (pwdInput) {
-      pwdInput.addEventListener('input', checkPassword);
-    }
-    if (confirmInput) {
-      confirmInput.addEventListener('input', checkPassword);
-    }
+      if (pwdInput) pwdInput.addEventListener('input', checkPassword);
+      if (confirmInput) confirmInput.addEventListener('input', checkPassword);
+      checkPassword();
 
-    checkPassword();
-  })();
-</script>
-
+      // Form submit handler with loading state and duplicate submission prevention
+      var form = document.getElementById('signupForm');
+      var btn = document.getElementById('submitSignupBtn');
+      if (form && btn) {
+        var isSubmitting = false;
+        form.addEventListener('submit', function(e) {
+          if (isSubmitting) {
+            e.preventDefault();
+            return false;
+          }
+          isSubmitting = true;
+          btn.disabled = true;
+          btn.innerHTML = '<span class="btn-spinner" aria-hidden="true"></span><span>Creating Account...</span>';
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

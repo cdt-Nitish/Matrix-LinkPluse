@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
+  <%- include('partials/theme-head') %>
 </head>
 <body class="app-layout">
 <%- include('partials/nav', { page: 'admin' }) %>
@@ -21,6 +22,11 @@
       <span class="topbar-page-label">Admin &amp; Security</span>
     </div>
     <div class="topbar-right">
+      <button type="button" class="theme-toggle-btn" data-theme-toggle aria-label="Toggle theme" title="Toggle theme" style="width:36px;height:36px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon-sun" aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
       <% if (typeof user !== 'undefined' && user) { %>
         <a href="/profile" class="topbar-user-pill" title="View Profile">
           <span class="topbar-avatar"><%= (user.fullName ? user.fullName[0] : (user.username ? user.username[0] : 'U')).toUpperCase() %></span>

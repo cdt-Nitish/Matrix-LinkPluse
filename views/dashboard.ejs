@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
+  <%- include('partials/theme-head') %>
 </head>
 <body class="app-layout">
 
@@ -24,6 +25,73 @@
       <span class="topbar-page-label"><%= typeof isAdmin !== 'undefined' && isAdmin ? 'Platform Links' : 'Dashboard' %></span>
     </div>
     <div class="topbar-right">
+      <!-- Notification Center Container -->
+      <div class="notification-wrap" id="notificationWrap">
+        <button
+          type="button"
+          class="notification-btn"
+          id="notificationToggleBtn"
+          aria-label="Notifications (2 unread)"
+          aria-haspopup="true"
+          aria-expanded="false"
+          title="Notifications"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span class="notification-badge" id="notifBadge" aria-label="2 unread notifications">2</span>
+        </button>
+
+        <!-- Notification Dropdown Menu -->
+        <div class="notification-dropdown" id="notificationDropdown" role="menu" aria-label="Notifications list">
+          <div class="notif-dropdown-header">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span class="notif-header-title">Notifications</span>
+              <span class="notif-header-count" id="notifHeaderCount">2 new</span>
+            </div>
+            <button type="button" class="notif-mark-read-btn" id="markAllReadBtn">
+              Mark all as read
+            </button>
+          </div>
+
+          <div class="notif-list" id="notifList">
+            <div class="notif-item unread" data-notif-id="1">
+              <span class="notif-unread-dot" aria-hidden="true"></span>
+              <div class="notif-item-content">
+                <div class="notif-item-title">Click Milestone Reached</div>
+                <div class="notif-item-desc">Your short links received new engagement across campaigns.</div>
+                <div class="notif-item-time">10 minutes ago</div>
+              </div>
+            </div>
+            <div class="notif-item unread" data-notif-id="2">
+              <span class="notif-unread-dot" aria-hidden="true"></span>
+              <div class="notif-item-content">
+                <div class="notif-item-title">System Health Verified</div>
+                <div class="notif-item-desc">All redirection endpoints and custom domains are operating normally.</div>
+                <div class="notif-item-time">1 hour ago</div>
+              </div>
+            </div>
+            <div class="notif-item" data-notif-id="3">
+              <div class="notif-item-content" style="padding-left:14px;">
+                <div class="notif-item-title">Welcome to LinkPulse</div>
+                <div class="notif-item-desc">Workspace initialized. Create branded links, track clicks, and generate QR codes.</div>
+                <div class="notif-item-time">Yesterday</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="notif-dropdown-footer">
+            <a href="/analytics" class="notif-footer-link">View link performance &rarr;</a>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="theme-toggle-btn" data-theme-toggle aria-label="Toggle theme" title="Toggle theme" style="width:36px;height:36px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon-sun" aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
       <% if (typeof user !== 'undefined' && user) { %>
         <a href="/profile" class="topbar-user-pill" title="View Profile">
           <span class="topbar-avatar"><%= (user.fullName ? user.fullName[0] : (user.username ? user.username[0] : 'U')).toUpperCase() %></span>
@@ -107,35 +175,88 @@
     <!-- Summary Statistic Cards -->
     <div class="stats-row">
       <div class="stat-card">
-        <div class="stat-value"><%= links.length %></div>
-        <div class="stat-label"><%= typeof isAdmin !== 'undefined' && isAdmin ? 'Platform Links' : 'My Links' %></div>
+        <div class="stat-icon-wrap stat-icon-blue" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value"><%= links.length %></div>
+          <div class="stat-label"><%= typeof isAdmin !== 'undefined' && isAdmin ? 'Platform Links' : 'My Links' %></div>
+        </div>
       </div>
+
       <div class="stat-card">
-        <div class="stat-value"><%= links.filter(l => l.status === 'active').length %></div>
-        <div class="stat-label">Active Links</div>
+        <div class="stat-icon-wrap stat-icon-green" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value"><%= links.filter(l => l.status === 'active').length %></div>
+          <div class="stat-label">Active Links</div>
+        </div>
       </div>
+
       <div class="stat-card">
-        <div class="stat-value"><%= links.reduce((s,l) => s + (l.currentClicks || 0), 0).toLocaleString() %></div>
-        <div class="stat-label"><%= typeof isAdmin !== 'undefined' && isAdmin ? 'Total Network Clicks' : 'My Link Clicks' %></div>
+        <div class="stat-icon-wrap stat-icon-amber" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m3 3 7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/>
+            <path d="m13 13 6 6"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value"><%= links.reduce((s,l) => s + (l.currentClicks || 0), 0).toLocaleString() %></div>
+          <div class="stat-label"><%= typeof isAdmin !== 'undefined' && isAdmin ? 'Total Network Clicks' : 'My Link Clicks' %></div>
+        </div>
       </div>
+
       <div class="stat-card">
-        <div class="stat-value"><%= campaigns.length %></div>
-        <div class="stat-label">Campaigns</div>
+        <div class="stat-icon-wrap stat-icon-purple" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m3 11 18-5v12L3 13v-2z"/>
+            <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value"><%= campaigns.length %></div>
+          <div class="stat-label">Campaigns</div>
+        </div>
       </div>
+    </div>
+
+    <!-- Decorative Section Divider with Center Link Icon -->
+    <div class="dashboard-section-divider" aria-hidden="true">
+      <div class="divider-line"></div>
+      <div class="divider-icon-bubble">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+        </svg>
+      </div>
+      <div class="divider-line"></div>
     </div>
 
     <!-- Main Links Table Section -->
     <div class="section">
       <div class="section-header">
         <h2 class="section-title"><%= typeof isAdmin !== 'undefined' && isAdmin ? 'All Network Links' : 'My Active Links' %></h2>
-        <input
-          type="text"
-          id="linkSearch"
-          class="input"
-          style="width:220px;padding:0.4rem 0.75rem;font-size:0.84rem;"
-          placeholder="Search links…"
-          oninput="filterLinks(this.value)"
-        >
+        <div class="search-bar-wrap">
+          <svg class="search-bar-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            type="text"
+            id="linkSearch"
+            class="table-search-input"
+            placeholder="Search links..."
+            aria-label="Search links"
+            oninput="filterLinks(this.value)"
+          >
+          <kbd class="search-kbd-hint" title="Press Ctrl+K to search">Ctrl K</kbd>
+        </div>
       </div>
 
       <% if (links.length === 0) { %>
@@ -162,7 +283,7 @@
               <th style="text-align:right;width:100px;">Clicks</th>
               <th style="width:90px;">Status</th>
               <th style="width:110px;">Expires</th>
-              <th style="text-align:right;width:140px;">Actions</th>
+              <th style="text-align:right;width:170px;">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -185,7 +306,7 @@
                 <% } %>
               </td>
               <td style="text-align:right">
-                <span style="font-weight:600;color:var(--dark-navy)"><%= link.currentClicks.toLocaleString() %></span><% if (link.maxClicks) { %><span class="muted" style="font-size:0.75rem;color:var(--text-muted)"> / <%= link.maxClicks %></span><% } %>
+                <span class="link-clicks-count"><%= link.currentClicks.toLocaleString() %></span><% if (link.maxClicks) { %><span class="muted" style="font-size:0.75rem;color:var(--text-muted)"> / <%= link.maxClicks %></span><% } %>
               </td>
               <td>
                 <span class="badge badge-<%= link.status %>"><%= link.status %></span>
@@ -199,14 +320,17 @@
               </td>
               <td style="text-align:right">
                 <div class="actions-cell">
-                  <button type="button" class="btn-action" title="Copy Short Link" onclick="copyLink('<%= link.shortCode %>', this)">
+                  <button type="button" class="btn-action btn-action-copy" title="Copy Short Link" onclick="copyLink('<%= link.shortCode %>', this)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                   </button>
-                  <button type="button" class="btn-action" title="Share Link &amp; QR" onclick="openShareModal('<%= link.shortCode %>', '<%= encodeURIComponent(link.title || '') %>', '<%= encodeURIComponent(link.originalUrl || '') %>')">
+                  <button type="button" class="btn-action btn-action-share" title="Share Link &amp; QR" onclick="openShareModal('<%= link.shortCode %>', '<%= encodeURIComponent(link.title || '') %>', '<%= encodeURIComponent(link.originalUrl || '') %>')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                   </button>
+                  <a href="/analytics" class="btn-action btn-action-analytics" title="View Link Analytics">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                  </a>
                   <form method="POST" action="/links/<%= link.shortCode %>/toggle" style="margin:0;display:inline-flex">
-                    <button type="submit" class="btn-action" title="<%= link.status === 'active' ? 'Disable link' : 'Enable link' %>">
+                    <button type="submit" class="btn-action btn-action-toggle" title="<%= link.status === 'active' ? 'Disable link' : 'Enable link' %>">
                       <% if (link.status === 'active') { %>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
                       <% } else { %>
@@ -215,7 +339,7 @@
                     </button>
                   </form>
                   <form method="POST" action="/links/<%= link.shortCode %>/delete" onsubmit="return confirm('Permanently delete link /<%= link.shortCode %>? This action cannot be undone.')" style="margin:0;display:inline-flex">
-                    <button type="submit" class="btn-action" title="Delete link" style="color:var(--error)">
+                    <button type="submit" class="btn-action btn-action-delete" title="Delete link">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                     </button>
                   </form>
@@ -237,11 +361,90 @@
 
 <script>
 function filterLinks(q) {
-  const query = q.toLowerCase();
+  const query = (q || '').toLowerCase();
   document.querySelectorAll('#linksTable tbody tr').forEach(r => {
-    r.style.display = r.dataset.q.includes(query) ? '' : 'none';
+    const text = (r.dataset.q || '').toLowerCase();
+    r.style.display = text.includes(query) ? '' : 'none';
   });
 }
+
+// Keyboard shortcut: Ctrl+K or Cmd+K to focus search input
+document.addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+    e.preventDefault();
+    const searchInput = document.getElementById('linkSearch');
+    if (searchInput) {
+      searchInput.focus();
+      searchInput.select();
+    }
+  }
+});
+
+// Notification dropdown toggle & outside click handling
+(function() {
+  const notifBtn = document.getElementById('notificationToggleBtn');
+  const notifDropdown = document.getElementById('notificationDropdown');
+  const notifWrap = document.getElementById('notificationWrap');
+  const markAllReadBtn = document.getElementById('markAllReadBtn');
+  const notifBadge = document.getElementById('notifBadge');
+  const notifHeaderCount = document.getElementById('notifHeaderCount');
+
+  if (notifBtn && notifDropdown) {
+    notifBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const isOpen = notifDropdown.classList.contains('open');
+      if (isOpen) {
+        notifDropdown.classList.remove('open');
+        notifBtn.setAttribute('aria-expanded', 'false');
+      } else {
+        notifDropdown.classList.add('open');
+        notifBtn.setAttribute('aria-expanded', 'true');
+      }
+    });
+
+    document.addEventListener('click', function(e) {
+      if (notifWrap && !notifWrap.contains(e.target)) {
+        notifDropdown.classList.remove('open');
+        notifBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && notifDropdown.classList.contains('open')) {
+        notifDropdown.classList.remove('open');
+        notifBtn.setAttribute('aria-expanded', 'false');
+        notifBtn.focus();
+      }
+    });
+  }
+
+  if (markAllReadBtn) {
+    markAllReadBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      document.querySelectorAll('#notifList .notif-item.unread').forEach(function(item) {
+        item.classList.remove('unread');
+        const dot = item.querySelector('.notif-unread-dot');
+        if (dot) dot.remove();
+        const content = item.querySelector('.notif-item-content');
+        if (content) content.style.paddingLeft = '14px';
+      });
+
+      if (notifBadge) {
+        notifBadge.style.display = 'none';
+      }
+      if (notifHeaderCount) {
+        notifHeaderCount.textContent = '0 new';
+      }
+      if (notifBtn) {
+        notifBtn.setAttribute('aria-label', 'Notifications');
+      }
+      markAllReadBtn.textContent = 'All read';
+      markAllReadBtn.disabled = true;
+      markAllReadBtn.style.opacity = '0.6';
+      markAllReadBtn.style.cursor = 'default';
+    });
+  }
+})();
 </script>
 </body>
 </html>

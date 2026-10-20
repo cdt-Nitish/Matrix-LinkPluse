@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -9,135 +9,182 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
+  <%- include('partials/theme-head') %>
 </head>
 <body class="landing-page">
 
-  <!-- Compact Landing Navbar -->
-  <header class="landing-nav-container">
-    <div class="container">
-      <nav class="landing-navbar" aria-label="Main Navigation">
-        <!-- Brand -->
-        <a href="/" class="landing-brand" id="landingBrandLink">
-          <div class="sidebar-logo-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="13 2 13 9 20 9"/>
-              <path d="M20 9L13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
-            </svg>
-          </div>
-          <span>LinkPulse</span>
-        </a>
-
-        <!-- Desktop Navigation Links -->
-        <div class="landing-nav-right">
-          <a href="#features" class="landing-nav-link">Features</a>
-          <a href="#how-it-works" class="landing-nav-link">How It Works</a>
-          <a href="/login" class="landing-nav-link">Sign In</a>
-          <a href="/signup" class="btn btn-primary btn-sm" id="landingGetStartedBtn">Get Started</a>
+  <!-- Desktop & Mobile Header (Single Theme Toggle) -->
+  <header class="landing-header" id="mainHeader">
+    <div class="landing-header-inner">
+      <!-- Logo & Wordmark -->
+      <a href="/" class="landing-brand" id="landingBrandLink" aria-label="LinkPulse Home">
+        <div class="landing-logo-box" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="13 2 13 9 20 9"/>
+            <path d="M20 9L13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+          </svg>
         </div>
+        <span class="landing-wordmark">LinkPulse</span>
+      </a>
 
-        <!-- Mobile Menu Toggle Button -->
-        <button type="button" class="landing-mobile-menu-btn" id="landingMobileMenuToggle" aria-label="Toggle mobile menu" onclick="toggleLandingMenu()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Desktop Navigation Menu -->
+      <nav class="landing-nav-center" aria-label="Main Navigation">
+        <a href="#features" class="landing-nav-link">Features</a>
+        <a href="#how-it-works" class="landing-nav-link">How It Works</a>
+        <a href="#pricing" class="landing-nav-link">Pricing</a>
+        <a href="/login" class="landing-nav-link">Sign In</a>
+      </nav>
+
+      <!-- Desktop Right Controls: Exactly ONE Theme Toggle & Get Started -->
+      <div class="landing-nav-right">
+        <a href="/signup" class="btn-get-started" id="navGetStartedBtn">Get Started</a>
+        <button 
+          type="button" 
+          class="theme-toggle-control" 
+          data-theme-toggle 
+          aria-label="Switch to light mode" 
+          title="Switch to light mode"
+          id="globalThemeToggle"
+        >
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon-sun" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </button>
+        <button type="button" class="landing-mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu" onclick="toggleMobileNav()">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="3" y1="12" x2="21" y2="12"/>
             <line x1="3" y1="6" x2="21" y2="6"/>
             <line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
         </button>
-      </nav>
+      </div>
     </div>
 
     <!-- Mobile Drawer Menu -->
-    <div class="landing-mobile-menu" id="landingMobileMenu">
-      <a href="#features" class="landing-nav-link" onclick="closeLandingMenu()">Features</a>
-      <a href="#how-it-works" class="landing-nav-link" onclick="closeLandingMenu()">How It Works</a>
-      <div class="landing-mobile-actions">
-        <a href="/login" class="btn btn-ghost btn-sm" style="width:100%;">Sign In</a>
-        <a href="/signup" class="btn btn-primary btn-sm" style="width:100%;">Get Started</a>
+    <div class="landing-mobile-drawer" id="mobileNavDrawer">
+      <a href="#features" class="mobile-nav-link" onclick="closeMobileNav()">Features</a>
+      <a href="#how-it-works" class="mobile-nav-link" onclick="closeMobileNav()">How It Works</a>
+      <a href="#pricing" class="mobile-nav-link" onclick="closeMobileNav()">Pricing</a>
+      <a href="/login" class="mobile-nav-link" onclick="closeMobileNav()">Sign In</a>
+      <div class="mobile-drawer-cta">
+        <a href="/signup" class="btn btn-primary" style="width:100%;height:46px;display:flex;align-items:center;justify-content:center;">Get Started Free</a>
       </div>
     </div>
   </header>
 
   <main class="main-content">
-    <!-- Hero Section (Clean Two-Column Layout) -->
+    <!-- Hero Section (Two-Column Layout) -->
     <section class="landing-hero-section">
-      <div class="container">
+      <div class="landing-container">
         <div class="landing-hero-grid">
           
-          <!-- Hero Content (Left) -->
-          <div class="landing-hero-left">
-            <div class="landing-label-pill">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 6 12 12 14 14"/>
-              </svg>
+          <!-- Left Column (52%) -->
+          <div class="hero-left-column">
+            <!-- Badge -->
+            <div class="hero-badge">
+              <span class="badge-dot" aria-hidden="true"></span>
               <span>Simple. Secure. Trackable.</span>
             </div>
 
-            <h1 class="landing-hero-title">
+            <!-- Headline -->
+            <h1 class="hero-title">
               Short links.<br/>
-              <span class="highlight-blue">Clear insights.</span>
+              <span class="hero-title-accent">Clear insights.</span>
             </h1>
 
-            <p class="landing-hero-desc">
+            <!-- Supporting Description -->
+            <p class="hero-description">
               Create short links, share them anywhere, and track their performance with simple, useful analytics.
             </p>
 
-            <div class="landing-hero-cta">
-              <a href="/signup" class="btn btn-primary btn-lg" id="heroGetStartedCta">Get Started Free</a>
-              <a href="/login" class="btn btn-ghost btn-lg" id="heroSignInCta">Sign In</a>
+            <!-- CTA Buttons -->
+            <div class="hero-cta-group">
+              <a href="/signup" class="btn-hero-primary" id="heroGetStartedCta">
+                <span>Get Started Free</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </a>
+              <a href="/login" class="btn-hero-secondary" id="heroSignInCta">
+                Sign In
+              </a>
             </div>
           </div>
 
-          <!-- Product Preview (Right Column) -->
-          <div class="landing-hero-right">
-            <div class="product-preview-card" id="productPreviewCard">
-              <div class="preview-top-bar">
-                <div class="preview-dot-group">
-                  <span class="preview-dot"></span>
-                  <span class="preview-dot"></span>
-                  <span class="preview-dot"></span>
+          <!-- Right Column: URL Shortener Preview Card (48%) -->
+          <div class="hero-right-column">
+            <div class="browser-preview-card" id="urlPreviewCard">
+              <!-- Browser Window Header -->
+              <div class="browser-header">
+                <div class="browser-dots" aria-hidden="true">
+                  <span class="b-dot dot-red"></span>
+                  <span class="b-dot dot-yellow"></span>
+                  <span class="b-dot dot-green"></span>
                 </div>
-                <div class="preview-title">LinkPulse Preview</div>
+                <div class="browser-title">LINKPULSE PREVIEW</div>
               </div>
 
-              <div class="preview-form">
-                <label for="previewUrlInput" style="font-size:0.78rem;color:var(--text-secondary);font-weight:600;">Destination URL</label>
-                <div class="preview-input-row">
-                  <input
-                    type="url"
-                    id="previewUrlInput"
-                    class="input preview-input"
-                    value="https://example.com/company-launch"
-                    placeholder="https://yourlink.com/long-page-url"
-                  />
-                  <button type="button" class="btn btn-primary preview-short-btn" id="previewShortenBtn" onclick="simulateShorten()">
-                    Shorten
-                  </button>
-                </div>
-
-                <div class="preview-result-box" id="previewResultBox">
-                  <div class="preview-link-info">
-                    <div class="preview-link-label">Generated Link</div>
-                    <div class="preview-link-val" id="previewGeneratedLink">linkpulse.io/launch</div>
+              <!-- Preview Form Body -->
+              <div class="browser-body">
+                <form id="previewShortenForm" class="preview-form" onsubmit="handlePreviewShorten(event)">
+                  <label for="previewUrlInput" class="preview-field-label">Destination URL</label>
+                  <div class="preview-input-row">
+                    <input 
+                      type="url" 
+                      id="previewUrlInput" 
+                      class="preview-input-field" 
+                      value="https://example.com/company-launch"
+                      placeholder="https://example.com/long-page-url" 
+                      required
+                      autocomplete="off"
+                    />
+                    <button type="submit" class="btn-preview-shorten" id="previewShortenBtn">
+                      <span id="shortenBtnText">Shorten</span>
+                      <svg class="preview-spinner" id="shortenBtnSpinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="display:none;" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="12"/>
+                      </svg>
+                    </button>
                   </div>
-                  <button type="button" class="btn btn-ghost btn-sm" id="previewCopyBtn" onclick="copyPreviewLink()">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <!-- Error notice area -->
+                  <div class="preview-error-msg" id="previewErrorMsg" style="display:none;" role="alert"></div>
+                </form>
+
+                <!-- Generated Link Panel -->
+                <div class="generated-link-panel" id="generatedLinkPanel">
+                  <div class="generated-link-left">
+                    <div class="generated-link-label">Generated Link</div>
+                    <a href="javascript:void(0)" class="generated-link-url" id="generatedLinkDisplay" target="_blank" rel="noopener">linkpulse.io/launch</a>
+                  </div>
+                  <button type="button" class="btn-preview-copy" id="previewCopyBtn" onclick="copyPreviewLink()" aria-label="Copy short link">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
                       <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
                     </svg>
-                    <span id="previewCopyText">Copy</span>
+                    <span id="copyBtnLabel">Copy</span>
                   </button>
                 </div>
 
-                <div class="preview-counter-footer">
-                  <span>Live Click Counter:</span>
-                  <span class="preview-stat-pill" id="previewClickCount">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary);">
-                      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-                      <polyline points="17 6 23 6 23 12"/>
+                <!-- Divider -->
+                <div class="preview-divider" aria-hidden="true"></div>
+
+                <!-- Click Counter / Telemetry -->
+                <div class="preview-telemetry-row">
+                  <div class="telemetry-info">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary);flex-shrink:0;">
+                      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
                     </svg>
-                    <span id="clickNumber">1,428 clicks</span>
-                  </span>
+                    <span class="telemetry-label" id="telemetryStatusLabel">Live Sample Telemetry</span>
+                  </div>
+                  <div class="telemetry-pill" id="telemetryPill">
+                    <span id="previewClickCountNum">1,428</span> clicks
+                  </div>
+                </div>
+
+                <!-- Guest prompt -->
+                <div class="preview-guest-note" id="previewGuestNote">
+                  <span style="color:var(--success);">● Active link.</span>
+                  <a href="/signup" style="color:var(--primary);text-decoration:underline;">Create free account</a> to customize alias and save analytics.
                 </div>
               </div>
             </div>
@@ -147,52 +194,52 @@
       </div>
     </section>
 
-    <!-- Minimal Features Section (Only Three Key Features) -->
+    <!-- Three Feature Cards Section -->
     <section class="landing-features-section" id="features">
-      <div class="container">
+      <div class="landing-container">
         <div class="features-grid">
           
-          <!-- Feature 1: Shorten Links -->
-          <div class="feature-card">
-            <div class="feature-icon-wrap">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <!-- Card 1: Shorten Links -->
+          <div class="feature-card" id="featureCardShorten">
+            <div class="feature-icon-box" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
                 <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
               </svg>
             </div>
-            <h2 class="feature-heading">Shorten Links</h2>
-            <p class="feature-description">
-              Turn long URLs into shareable links. Create custom memorable aliases in seconds with high-speed redirects.
+            <h2 class="feature-title">Shorten Links</h2>
+            <p class="feature-desc">
+              Turn long URLs into shareable links. Create custom aliases in seconds with high-speed redirects.
             </p>
           </div>
 
-          <!-- Feature 2: Track Clicks -->
-          <div class="feature-card">
-            <div class="feature-icon-wrap">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <!-- Card 2: Track Clicks -->
+          <div class="feature-card" id="featureCardTrack">
+            <div class="feature-icon-box" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="18" y1="20" x2="18" y2="10"/>
                 <line x1="12" y1="20" x2="12" y2="4"/>
                 <line x1="6" y1="20" x2="6" y2="14"/>
               </svg>
             </div>
-            <h2 class="feature-heading">Track Clicks</h2>
-            <p class="feature-description">
+            <h2 class="feature-title">Track Clicks</h2>
+            <p class="feature-desc">
               Understand how people interact with your links. Monitor click volume, device types, and traffic channels accurately.
             </p>
           </div>
 
-          <!-- Feature 3: Manage Links -->
-          <div class="feature-card">
-            <div class="feature-icon-wrap">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <!-- Card 3: Manage Links -->
+          <div class="feature-card" id="featureCardManage">
+            <div class="feature-icon-box" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="3" width="7" height="7"/>
                 <rect x="14" y="3" width="7" height="7"/>
                 <rect x="14" y="14" width="7" height="7"/>
                 <rect x="3" y="14" width="7" height="7"/>
               </svg>
             </div>
-            <h2 class="feature-heading">Manage Links</h2>
-            <p class="feature-description">
+            <h2 class="feature-title">Manage Links</h2>
+            <p class="feature-desc">
               Keep your shortened URLs organized. Group links into campaigns, set expirations, and enable password protection easily.
             </p>
           </div>
@@ -201,36 +248,123 @@
       </div>
     </section>
 
-    <!-- How It Works Section (Subtle anchor section) -->
-    <section id="how-it-works" style="padding: 2.5rem 0; border-top: 1px solid var(--border); background-color: var(--bg-main);">
-      <div class="container" style="max-width: 800px; text-align: center;">
-        <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--dark-navy); margin-bottom: 0.5rem;">How LinkPulse Works</h2>
-        <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 2rem;">
-          Three simple steps to publish and monitor your links.
-        </p>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; text-align: left;">
-          <div style="padding: 1.25rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-secondary);">
-            <div style="font-weight: 700; color: var(--primary); font-size: 1.25rem; margin-bottom: 0.35rem;">1. Paste URL</div>
-            <p style="font-size: 0.85rem; color: var(--text-secondary);">Enter your long web address and optionally specify a custom slug or campaign.</p>
+    <!-- How It Works Section -->
+    <section class="landing-section" id="how-it-works">
+      <div class="landing-container">
+        <div class="section-header">
+          <span class="section-eyebrow">WORKFLOW</span>
+          <h2 class="section-heading">How LinkPulse Works</h2>
+          <p class="section-subheading">Three simple steps to create, distribute, and evaluate high-performance URLs.</p>
+        </div>
+
+        <div class="workflow-steps-grid">
+          <div class="workflow-step-card">
+            <div class="step-badge">01</div>
+            <h3 class="step-title">Paste Destination URL</h3>
+            <p class="step-desc">Enter any web address. Add optional custom aliases, tags, password gates, or expiration timestamps.</p>
           </div>
-          <div style="padding: 1.25rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-secondary);">
-            <div style="font-weight: 700; color: var(--primary); font-size: 1.25rem; margin-bottom: 0.35rem;">2. Share Anywhere</div>
-            <p style="font-size: 0.85rem; color: var(--text-secondary);">Copy your clean short link or download an instant dynamic QR code.</p>
+
+          <div class="workflow-step-card">
+            <div class="step-badge">02</div>
+            <h3 class="step-title">Share Everywhere</h3>
+            <p class="step-desc">Distribute your clean short URL via social media, emails, documents, or instant high-resolution dynamic QR codes.</p>
           </div>
-          <div style="padding: 1.25rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-secondary);">
-            <div style="font-weight: 700; color: var(--primary); font-size: 1.25rem; margin-bottom: 0.35rem;">3. Review Telemetry</div>
-            <p style="font-size: 0.85rem; color: var(--text-secondary);">Track real-time visits, geographic sources, and referrers on your dashboard.</p>
+
+          <div class="workflow-step-card">
+            <div class="step-badge">03</div>
+            <h3 class="step-title">Monitor Telemetry</h3>
+            <p class="step-desc">Track real-time click counts, referral channels, user agents, operating systems, and geography from your central dashboard.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Compact Final CTA Section -->
+    <!-- Pricing Section -->
+    <!-- <section class="landing-section" id="pricing">
+      <div class="landing-container">
+        <div class="section-header">
+          <span class="section-eyebrow">PLANS &amp; TIERS</span>
+          <h2 class="section-heading">Simple, Transparent Pricing</h2>
+          <p class="section-subheading">Choose the plan that fits your link governance and analytics requirements.</p>
+        </div>
+
+        <div class="pricing-cards-grid"> -->
+          <!-- Free / Developer -->
+          <!-- <div class="pricing-card">
+            <div class="pricing-header">
+              <h3 class="pricing-tier-name">Starter</h3>
+              <p class="pricing-tier-desc">For developers and individuals shorting links occasionally.</p>
+              <div class="pricing-price-wrap">
+                <span class="pricing-currency">$</span>
+                <span class="pricing-amount">0</span>
+                <span class="pricing-period">/ month</span>
+              </div>
+            </div>
+            <ul class="pricing-features-list">
+              <li><span>✓</span> Up to 1,000 active short links</li>
+              <li><span>✓</span> Instant sub-millisecond redirects</li>
+              <li><span>✓</span> Dynamic QR code generation</li>
+              <li><span>✓</span> Standard click volume tracking</li>
+            </ul>
+            <a href="/signup" class="btn-pricing btn-pricing-outline">Get Started Free</a>
+          </div> -->
+
+          <!-- Growth / Pro -->
+          <!-- <div class="pricing-card pricing-card-featured">
+            <div class="pricing-popular-tag">MOST POPULAR</div>
+            <div class="pricing-header">
+              <h3 class="pricing-tier-name">Growth</h3>
+              <p class="pricing-tier-desc">For creators, marketers, and fast-moving teams.</p>
+              <div class="pricing-price-wrap">
+                <span class="pricing-currency">$</span>
+                <span class="pricing-amount">19</span>
+                <span class="pricing-period">/ month</span>
+              </div>
+            </div>
+            <ul class="pricing-features-list">
+              <li><span>✓</span> Up to 50,000 active links</li>
+              <li><span>✓</span> Custom branded aliases</li>
+              <li><span>✓</span> Password protection &amp; expiration dates</li>
+              <li><span>✓</span> Multi-link campaign grouping</li>
+              <li><span>✓</span> Complete device &amp; referrer telemetry</li>
+            </ul>
+            <a href="/signup" class="btn-pricing btn-pricing-primary">Start 14-Day Trial</a>
+          </div> -->
+
+          <!-- Enterprise -->
+          <!-- <div class="pricing-card">
+            <div class="pricing-header">
+              <h3 class="pricing-tier-name">Enterprise</h3>
+              <p class="pricing-tier-desc">For organizations demanding custom domains, compliance &amp; SLAs.</p>
+              <div class="pricing-price-wrap">
+                <span class="pricing-amount">Custom</span>
+              </div>
+            </div>
+            <ul class="pricing-features-list">
+              <li><span>✓</span> Unlimited short links &amp; campaigns</li>
+              <li><span>✓</span> Custom branded domain routing</li>
+              <li><span>✓</span> Team workspace access &amp; role governance</li>
+              <li><span>✓</span> REST API &amp; webhook integrations</li>
+              <li><span>✓</span> 99.99% uptime SLA &amp; dedicated support</li>
+            </ul>
+            <a href="/signup" class="btn-pricing btn-pricing-outline">Contact Sales</a>
+          </div>
+        </div>
+      </div>-->
+    </section> 
+
+    <!-- Bottom CTA Banner -->
     <section class="landing-cta-banner">
-      <div class="container">
-        <div class="cta-banner-inner">
-          <h2 class="cta-banner-title">Ready to simplify your links?</h2>
-          <a href="/signup" class="btn btn-primary btn-lg" id="finalGetStartedCta">Get Started Free</a>
+      <div class="landing-container">
+        <div class="cta-banner-card">
+          <div class="cta-banner-content">
+            <h2 class="cta-banner-heading">Ready to take control of your links?</h2>
+            <p class="cta-banner-sub">Join LinkPulse today to generate secure, trackable URLs in seconds.</p>
+          </div>
+          <div class="cta-banner-actions">
+            <a href="/signup" class="btn-hero-primary" style="height:48px;padding:0 24px;">Get Started Free</a>
+            <a href="/login" class="btn-hero-secondary" style="height:48px;padding:0 20px;">Sign In</a>
+          </div>
         </div>
       </div>
     </section>
@@ -238,111 +372,182 @@
 
   <!-- Clean Minimal Footer -->
   <footer class="landing-footer">
-    <div class="container">
-      <div class="landing-footer-inner">
-        <div style="display:flex;align-items:center;gap:0.5rem;">
-          <div class="sidebar-logo-icon" style="width:24px;height:24px;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;">
-              <polyline points="13 2 13 9 20 9"/>
-              <path d="M20 9L13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
-            </svg>
+    <div class="landing-container">
+      <div class="footer-inner">
+        <!-- Left: Brand & Tagline -->
+        <div class="footer-left">
+          <div class="landing-brand">
+            <div class="landing-logo-box" style="width:28px;height:28px;" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;">
+                <polyline points="13 2 13 9 20 9"/>
+                <path d="M20 9L13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+              </svg>
+            </div>
+            <span class="landing-wordmark" style="font-size:17px;">LinkPulse</span>
           </div>
-          <strong style="color:var(--dark-navy);font-size:0.95rem;">LinkPulse</strong>
+          <p class="footer-copyright">
+            &copy; <%= new Date().getFullYear() %> LinkPulse Technologies. All rights reserved.
+          </p>
         </div>
 
-        <div class="landing-footer-links">
-          <a href="#features" class="landing-footer-link">Features</a>
-          <a href="#how-it-works" class="landing-footer-link">How It Works</a>
-          <a href="/login" class="landing-footer-link">Sign In</a>
-          <a href="/signup" class="landing-footer-link">Sign Up</a>
-        </div>
-
-        <div class="landing-copyright">
-          &copy; <%= new Date().getFullYear() %> LinkPulse. All rights reserved.
-        </div>
+        <!-- Right: Links -->
+        <nav class="footer-nav" aria-label="Footer Navigation">
+          <a href="#features" class="footer-link">Features</a>
+          <a href="#how-it-works" class="footer-link">How It Works</a>
+          <a href="#pricing" class="footer-link">Pricing</a>
+          <a href="/login" class="footer-link">Sign In</a>
+          <a href="/signup" class="footer-link">Create Account</a>
+        </nav>
       </div>
     </div>
   </footer>
 
-  <!-- Toast Notification element for copy feedback -->
-  <div class="toast-container" id="toastContainer">
-    <div class="toast" id="landingToast">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Universal Toast Feedback -->
+  <div class="toast-container" id="landingToastContainer" aria-live="polite">
+    <div class="toast toast-popup" id="landingToast">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="toast-icon" aria-hidden="true">
         <polyline points="20 6 9 17 4 12"/>
       </svg>
-      <span id="landingToastMsg">Copied to clipboard!</span>
+      <span id="toastMessage">Copied to clipboard!</span>
     </div>
   </div>
 
   <script>
-    // Mobile navigation toggle
-    function toggleLandingMenu() {
-      const menu = document.getElementById('landingMobileMenu');
-      if (menu) menu.classList.toggle('open');
+    // Mobile navigation drawer toggle
+    function toggleMobileNav() {
+      var drawer = document.getElementById('mobileNavDrawer');
+      if (drawer) drawer.classList.toggle('open');
     }
 
-    function closeLandingMenu() {
-      const menu = document.getElementById('landingMobileMenu');
-      if (menu) menu.classList.remove('open');
+    function closeMobileNav() {
+      var drawer = document.getElementById('mobileNavDrawer');
+      if (drawer) drawer.classList.remove('open');
     }
 
-    // Interactive product preview simulation
-    let currentClickCount = 1428;
-    function simulateShorten() {
-      const input = document.getElementById('previewUrlInput');
-      const genLink = document.getElementById('previewGeneratedLink');
-      const clickEl = document.getElementById('clickNumber');
-      if (!input || !genLink) return;
+    // Active full short URL for copy action
+    var currentShortFullUrl = window.location.origin + '/launch';
 
-      const urlVal = input.value.trim();
-      let slug = 'launch';
+    // Interactive URL shortening preview handler
+    async function handlePreviewShorten(e) {
+      e.preventDefault();
+      var input = document.getElementById('previewUrlInput');
+      var btn = document.getElementById('previewShortenBtn');
+      var btnText = document.getElementById('shortenBtnText');
+      var spinner = document.getElementById('shortenBtnSpinner');
+      var errorMsg = document.getElementById('previewErrorMsg');
+      var linkDisplay = document.getElementById('generatedLinkDisplay');
+      var telemetryNum = document.getElementById('previewClickCountNum');
+      var guestNote = document.getElementById('previewGuestNote');
+
+      if (!input) return;
+      var url = input.value.trim();
+      if (!url) {
+        if (errorMsg) {
+          errorMsg.textContent = 'Please enter a valid destination URL.';
+          errorMsg.style.display = 'block';
+        }
+        return;
+      }
+
+      if (errorMsg) errorMsg.style.display = 'none';
+      if (btn) btn.disabled = true;
+      if (btnText) btnText.style.display = 'none';
+      if (spinner) spinner.style.display = 'inline-block';
+
       try {
-        if (urlVal) {
-          const parsed = new URL(urlVal.startsWith('http') ? urlVal : 'https://' + urlVal);
-          const parts = parsed.pathname.split('/').filter(Boolean);
-          if (parts.length > 0) {
-            slug = parts[parts.length - 1].slice(0, 10).toLowerCase().replace(/[^a-z0-9]/g, '');
+        var res = await fetch('/api/shorten-preview', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ destinationUrl: url })
+        });
+        var data = await res.json();
+
+        if (data.success) {
+          currentShortFullUrl = data.shortUrl;
+          if (linkDisplay) {
+            linkDisplay.textContent = data.displayUrl;
+            linkDisplay.href = data.shortUrl;
+          }
+          if (telemetryNum) {
+            telemetryNum.textContent = '0';
+          }
+          if (guestNote) {
+            guestNote.style.display = 'block';
+          }
+          showToast('Short link created: ' + data.displayUrl);
+        } else {
+          if (errorMsg) {
+            errorMsg.textContent = data.error || 'Failed to generate link.';
+            errorMsg.style.display = 'block';
           }
         }
-      } catch (e) {
-        slug = 'custom' + Math.floor(Math.random() * 90 + 10);
+      } catch (err) {
+        // Fallback for offline/network issues
+        var slug = 'link' + Math.floor(Math.random() * 900 + 100);
+        currentShortFullUrl = window.location.origin + '/' + slug;
+        if (linkDisplay) {
+          linkDisplay.textContent = 'linkpulse.io/' + slug;
+          linkDisplay.href = currentShortFullUrl;
+        }
+        showToast('Link generated: linkpulse.io/' + slug);
+      } finally {
+        if (btn) btn.disabled = false;
+        if (btnText) btnText.style.display = 'inline';
+        if (spinner) spinner.style.display = 'none';
       }
-      if (!slug) slug = 'link' + Math.floor(Math.random() * 90 + 10);
-
-      genLink.textContent = 'linkpulse.io/' + slug;
-      currentClickCount += 1;
-      if (clickEl) clickEl.textContent = currentClickCount.toLocaleString() + ' clicks';
-      showToast('Link created: linkpulse.io/' + slug);
     }
 
+    // Copy Generated Link
     function copyPreviewLink() {
-      const genLink = document.getElementById('previewGeneratedLink');
-      const copyText = document.getElementById('previewCopyText');
-      if (!genLink) return;
+      var copyLabel = document.getElementById('copyBtnLabel');
+      var toCopy = currentShortFullUrl;
 
-      const fullUrl = window.location.origin + '/' + genLink.textContent.split('/').pop();
-      navigator.clipboard.writeText(fullUrl).then(() => {
-        if (copyText) copyText.textContent = 'Copied!';
-        showToast('Link copied to clipboard');
-        setTimeout(() => {
-          if (copyText) copyText.textContent = 'Copy';
-        }, 2000);
-      }).catch(() => {
-        if (copyText) copyText.textContent = 'Copied!';
-        setTimeout(() => {
-          if (copyText) copyText.textContent = 'Copy';
-        }, 2000);
-      });
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(toCopy).then(function () {
+          setCopiedState(copyLabel);
+          showToast('Copied link to clipboard!');
+        }).catch(function () {
+          fallbackCopy(toCopy, copyLabel);
+        });
+      } else {
+        fallbackCopy(toCopy, copyLabel);
+      }
+    }
+
+    function fallbackCopy(text, copyLabel) {
+      try {
+        var el = document.createElement('textarea');
+        el.value = text;
+        el.setAttribute('readonly', '');
+        el.style.position = 'absolute';
+        el.style.left = '-9999px';
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        setCopiedState(copyLabel);
+        showToast('Copied link to clipboard!');
+      } catch (err) {
+        setCopiedState(copyLabel);
+        showToast('Copied link to clipboard!');
+      }
+    }
+
+    function setCopiedState(copyLabel) {
+      if (copyLabel) copyLabel.textContent = 'Copied!';
+      setTimeout(function () {
+        if (copyLabel) copyLabel.textContent = 'Copy';
+      }, 2000);
     }
 
     function showToast(msg) {
-      const toast = document.getElementById('landingToast');
-      const toastMsg = document.getElementById('landingToastMsg');
+      var toast = document.getElementById('landingToast');
+      var toastMsg = document.getElementById('toastMessage');
       if (!toast) return;
       if (toastMsg && msg) toastMsg.textContent = msg;
-      toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
+      toast.classList.add('visible');
+      setTimeout(function () {
+        toast.classList.remove('visible');
       }, 2500);
     }
   </script>

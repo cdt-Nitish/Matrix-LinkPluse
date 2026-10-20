@@ -55,6 +55,18 @@ app.use((req, res) => {
   });
 });
 
+// 500 server error handler
+app.use((err, req, res, next) => {
+  console.error('[Application Error]:', err);
+  if (res.headersSent) {
+    return next(err);
+  }
+  res.status(err.status || 500).render('error-fallback', {
+    type: 'disabled',
+    message: err.message || 'An unexpected server error occurred. Please try again.',
+  });
+});
+
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`LinkPulse running at http://localhost:${PORT}`);

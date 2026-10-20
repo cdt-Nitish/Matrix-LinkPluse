@@ -40,22 +40,41 @@ router.get('/', (req, res) => {
 });
 
 // Toggle link kill-switch
-router.post('/links/:code/toggle', (req, res) => {
-  const link = links.get(req.params.code);
+router.post('/links/:code/toggle', async (req, res) => {
+  const code = req.params.code;
+  const link = links.get(code);
   if (link) {
     link.status = link.status === 'active' ? 'disabled' : 'active';
+    try {
+      const { mongoose } = require('../config/db');
+      const LinkModel = require('../models/Link');
+      if (mongoose.connection && mongoose.connection.readyState === 1) {
+        await LinkModel.updateOne({ shortCode: code }, { status: link.status });
+      }
+    } catch (err) {
+      console.warn('[Admin] MongoDB toggle warning:', err.message);
+    }
   }
   res.redirect('/admin');
 });
 
 // Delete link
-router.post('/links/:code/delete', (req, res) => {
+router.post('/links/:code/delete', async (req, res) => {
   const code = req.params.code;
   links.delete(code);
   for (let i = clicks.length - 1; i >= 0; i--) {
     if (clicks[i].linkId === code) {
       clicks.splice(i, 1);
     }
+  }
+  try {
+    const { mongoose } = require('../config/db');
+    const LinkModel = require('../models/Link');
+    if (mongoose.connection && mongoose.connection.readyState === 1) {
+      await LinkModel.deleteOne({ shortCode: code });
+    }
+  } catch (err) {
+    console.warn('[Admin] MongoDB delete warning:', err.message);
   }
   res.redirect('/admin');
 });

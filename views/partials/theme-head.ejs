@@ -1,0 +1,13 @@
+<!-- LinkPulse Anti-FOUC Theme Initializer -->
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem('linkpulse-theme');
+      var theme = (saved === 'light') ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  })();
+</script>
+<script defer src="/js/theme.js"></script>

@@ -130,11 +130,11 @@ function copyLink(code, btn) {
   }
   const url = window.location.origin + '/' + cleanCode;
   copyTextToClipboard(url, () => {
-    showToast('Short link copied: ' + url);
+    showToast('Link copied: ' + url);
     if (btn) {
       const origHtml = btn.innerHTML;
       btn.classList.add('copied');
-      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>';
+      btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>';
       setTimeout(() => {
         btn.classList.remove('copied');
         btn.innerHTML = origHtml;
@@ -420,18 +420,25 @@ function execCopyFallback(text, onSuccess, fallbackInput) {
 }
 
 function showToast(message) {
-  const container = document.getElementById('toastContainer');
-  if (!container) return;
+  let container = document.getElementById('toastContainer') || document.getElementById('globalToastContainer');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toastContainer';
+    container.className = 'toast-container';
+    document.body.appendChild(container);
+  }
   const toast = document.createElement('div');
   toast.className = 'toast';
-  toast.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span>' + escapeHtml(message) + '</span>';
+  toast.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="toast-icon" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>' + escapeHtml(message) + '</span>';
   container.appendChild(toast);
 
   requestAnimationFrame(() => toast.classList.add('show'));
 
   setTimeout(() => {
     toast.classList.remove('show');
-    setTimeout(() => toast.remove(), 250);
+    setTimeout(() => {
+      if (toast.parentNode) toast.parentNode.removeChild(toast);
+    }, 250);
   }, 2600);
 }
 </script>
