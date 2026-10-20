@@ -7,12 +7,30 @@
   <meta name="description" content="Create a new LinkPulse workspace account.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
 </head>
-<body>
+<body class="auth-page">
 
-<%- include('partials/nav', { page: 'signup' }) %>
+  <!-- Compact Top Header for Auth Pages -->
+  <header class="landing-nav-container">
+    <div class="container">
+      <nav class="landing-navbar">
+        <a href="/" class="landing-brand">
+          <div class="sidebar-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="13 2 13 9 20 9"/>
+              <path d="M20 9L13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+            </svg>
+          </div>
+          <span>LinkPulse</span>
+        </a>
+        <div>
+          <a href="/" class="btn btn-ghost btn-sm">&larr; Back to Home</a>
+        </div>
+      </nav>
+    </div>
+  </header>
 
 <main class="main-content">
   <div class="container container-xs auth-page-container">
@@ -48,8 +66,8 @@
       <div class="alert alert-error" role="alert" id="signupErrorAlert">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         <div class="alert-content">
-          <div class="alert-title"><strong>Please resolve the following:</strong></div>
-          <ul class="alert-list">
+          <div style="font-weight:600;margin-bottom:4px;">Please resolve the following:</div>
+          <ul style="padding-left:1.25rem;margin:0;font-size:0.84rem;">
             <% errList.forEach(function(msg) { %>
               <li><%= msg %></li>
             <% }); %>
@@ -58,7 +76,7 @@
       </div>
       <% } %>
 
-      <!-- Pure Standard HTML Form Submission -->
+      <!-- HTML Form Submission -->
       <form method="POST" action="/signup" class="auth-form" id="signupForm" novalidate>
         
         <% 
@@ -68,7 +86,7 @@
         %>
 
         <!-- First & Last Name -->
-        <div class="form-grid">
+        <div class="auth-row-2col">
           <div class="form-group">
             <label for="firstName">First name <span class="required">*</span></label>
             <input 
@@ -76,7 +94,7 @@
               id="firstName" 
               name="firstName" 
               class="input" 
-              placeholder="Enter your first Name" 
+              placeholder="First name" 
               value="<%= currentInput.firstName || (currentInput.fullName ? currentInput.fullName.split(' ')[0] : '') %>" 
               required 
               autofocus 
@@ -90,7 +108,7 @@
               id="lastName" 
               name="lastName" 
               class="input" 
-              placeholder="Enter your last name" 
+              placeholder="Last name" 
               value="<%= currentInput.lastName || (currentInput.fullName ? currentInput.fullName.split(' ').slice(1).join(' ') : '') %>" 
             />
           </div>
@@ -106,13 +124,13 @@
             id="email" 
             name="email" 
             class="input" 
-            placeholder="sample@example.com" 
+            placeholder="name@company.com" 
             value="<%= currentInput.email || '' %>" 
             required 
           />
         </div>
 
-        <!-- Account Role / User Type Selection -->
+        <!-- Account Role Selection -->
         <div class="form-group">
           <label for="userType">Account Role <span class="required">*</span></label>
           <select id="userType" name="userType" class="input">
@@ -123,7 +141,7 @@
         </div>
 
         <!-- Password Inputs -->
-        <div class="form-grid">
+        <div class="auth-row-2col">
           <div class="form-group">
             <label for="password">Password <span class="required">*</span></label>
             <input 
@@ -131,7 +149,7 @@
               id="password" 
               name="password" 
               class="input" 
-              placeholder="Create strong password" 
+              placeholder="Strong password" 
               required 
               autocomplete="new-password"
             />
@@ -151,28 +169,28 @@
           </div>
         </div>
 
-        <!-- Live Password Requirements Guide (What user must enter) -->
+        <!-- Live Password Requirements Guide -->
         <div class="pwd-rules-container" id="pwdRulesBox">
           <div class="pwd-rules-heading">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
             </svg>
-            <span>Password Must Contain:</span>
+            <span>Password Requirements:</span>
           </div>
 
           <div class="pwd-rules-grid">
             <div class="pwd-rule-item" id="req-len">
               <span class="pwd-rule-dot">●</span>
-              <span>At least <strong>6 characters</strong></span>
+              <span>At least <strong>6 chars</strong></span>
             </div>
             <div class="pwd-rule-item" id="req-upper">
               <span class="pwd-rule-dot">●</span>
-              <span>One <strong>uppercase letter</strong> (A-Z)</span>
+              <span>One <strong>uppercase</strong> (A-Z)</span>
             </div>
             <div class="pwd-rule-item" id="req-lower">
               <span class="pwd-rule-dot">●</span>
-              <span>One <strong>lowercase letter</strong> (a-z)</span>
+              <span>One <strong>lowercase</strong> (a-z)</span>
             </div>
             <div class="pwd-rule-item" id="req-num">
               <span class="pwd-rule-dot">●</span>
@@ -180,7 +198,7 @@
             </div>
             <div class="pwd-rule-item" id="req-spec">
               <span class="pwd-rule-dot">●</span>
-              <span>One <strong>special character</strong> (!@#$%^&*)</span>
+              <span>Special char (!@#$%)</span>
             </div>
             <div class="pwd-rule-item" id="req-match">
               <span class="pwd-rule-dot">●</span>
@@ -189,21 +207,21 @@
           </div>
         </div>
 
-        <div class="form-group terms-group">
-          <label class="form-check">
-            <input type="checkbox" name="terms" id="terms" value="on" checked required>
+        <div class="form-group" style="margin-bottom:1.25rem;">
+          <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-weight:400;color:var(--text-secondary);font-size:0.84rem;">
+            <input type="checkbox" name="terms" id="terms" value="on" checked required style="accent-color:var(--primary);">
             <span>I agree to the Terms of Service &amp; Privacy Policy</span>
           </label>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-auth-submit" id="submitSignupBtn">
+        <button type="submit" class="btn btn-primary" style="width:100%;min-height:42px;font-size:0.95rem;" id="submitSignupBtn">
           Create Account
         </button>
       </form>
 
-      <div class="auth-switch-prompt">
+      <div style="text-align:center;margin-top:1.5rem;font-size:0.85rem;color:var(--text-secondary);">
         <span>Already have an account?</span>
-        <a href="/login" class="auth-link-bold">Sign in &rarr;</a>
+        <a href="/login" style="font-weight:600;color:var(--primary);margin-left:4px;">Sign in &rarr;</a>
       </div>
 
     </div>
@@ -242,7 +260,6 @@
       if (!element) return;
       if (isValid) {
         element.classList.add('valid');
-        element.classList.remove('invalid');
       } else {
         element.classList.remove('valid');
       }
@@ -267,7 +284,6 @@
       confirmInput.addEventListener('input', checkPassword);
     }
 
-    // Run initial check if pre-filled
     checkPassword();
   })();
 </script>

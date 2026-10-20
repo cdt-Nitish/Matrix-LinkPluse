@@ -4,45 +4,37 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><%= title %> — LinkPulse</title>
-  <meta name="description" content="<%= desc || 'LinkPulse: High-speed URL governance, routing and analytics engine.' %>">
+  <meta name="description" content="<%= typeof desc !== 'undefined' ? desc : 'LinkPulse: URL Governance & Analytics Engine.' %>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
   <%- typeof extraHead !== 'undefined' ? extraHead : '' %>
 </head>
-<body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="/" class="logo">
-        <span class="logo-dot"></span>
-        LinkPulse
-      </a>
-      <nav class="site-nav">
-        <% if (typeof user !== 'undefined' && user) { %>
-          <% const isAdm = (user.role || user.userType || '').toLowerCase() === 'admin' || (user.role || user.userType || '').toLowerCase() === 'host'; %>
-          <a href="/" class="nav-link <%= typeof page !== 'undefined' && page === 'dashboard' ? 'active' : '' %>">Dashboard</a>
-          <a href="/analytics" class="nav-link <%= typeof page !== 'undefined' && page === 'analytics' ? 'active' : '' %>">Analytics</a>
-          <a href="/campaigns" class="nav-link <%= typeof page !== 'undefined' && page === 'campaigns' ? 'active' : '' %>">Campaigns</a>
-          <% if (isAdm) { %>
-            <a href="/admin" class="nav-link <%= typeof page !== 'undefined' && page === 'admin' ? 'active' : '' %>">Admin</a>
-          <% } %>
-          <a href="/profile" class="nav-user-pill <%= typeof page !== 'undefined' && page === 'profile' ? 'active' : '' %>">
-            <span class="user-avatar-badge"><%= (user.fullName ? user.fullName[0] : 'U').toUpperCase() %></span>
-            <span><%= user.fullName ? user.fullName.split(' ')[0] : user.username %></span>
+<body class="<%= typeof user !== 'undefined' && user ? 'app-layout' : 'landing-page' %>">
+  <% if (typeof user !== 'undefined' && user) { %>
+    <%- include('nav', { page: typeof page !== 'undefined' ? page : 'dashboard' }) %>
+  <% } else { %>
+    <header class="landing-nav-container">
+      <div class="container">
+        <nav class="landing-navbar">
+          <a href="/" class="landing-brand">
+            <div class="sidebar-logo-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="13 2 13 9 20 9"/>
+                <path d="M20 9L13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+              </svg>
+            </div>
+            <span>LinkPulse</span>
           </a>
-          <a href="/logout" class="nav-link">Logout</a>
-          <a href="/links/new" class="btn btn-primary">+ New Link</a>
-        <% } else { %>
-          <a href="/#services" class="nav-link">Services</a>
-          <a href="/#roles" class="nav-link">Roles</a>
-          <a href="/#how-it-works" class="nav-link">How It Works</a>
-          <a href="/login" class="nav-link <%= typeof page !== 'undefined' && page === 'login' ? 'active' : '' %>">Log In</a>
-          <a href="/signup" class="btn btn-primary btn-sm">Sign Up Free</a>
-        <% } %>
-      </nav>
-    </div>
-  </header>
+          <div class="landing-nav-right">
+            <a href="/login" class="landing-nav-link">Sign In</a>
+            <a href="/signup" class="btn btn-primary btn-sm">Get Started</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+  <% } %>
 
   <main class="main-content">
     <div class="container">
@@ -50,10 +42,6 @@
     </div>
   </main>
 
-  <footer class="site-footer">
-    <div class="container">
-      <p>LinkPulse &mdash; URL Governance &amp; Analytics Engine &bull; Tech Geeks Hackathon 2026</p>
-    </div>
-  </footer>
+  <%- include('footer') %>
 </body>
 </html>

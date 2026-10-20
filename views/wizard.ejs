@@ -5,14 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>New Link — LinkPulse</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
 </head>
-<body>
+<body class="app-layout">
 
 <%- include('partials/nav', { page: 'dashboard' }) %>
 
 <main class="main-content">
+  <!-- Authenticated Topbar -->
+  <div class="app-topbar">
+    <div class="topbar-left">
+      <button type="button" class="topbar-drawer-btn" aria-label="Toggle navigation drawer" onclick="toggleSidebarDrawer()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="topbar-page-label">Create New Link</span>
+    </div>
+    <div class="topbar-right">
+      <% if (typeof user !== 'undefined' && user) { %>
+        <a href="/profile" class="topbar-user-pill" title="View Profile">
+          <span class="topbar-avatar"><%= (user.fullName ? user.fullName[0] : (user.username ? user.username[0] : 'U')).toUpperCase() %></span>
+          <span><%= user.fullName ? user.fullName.split(' ')[0] : user.username %></span>
+        </a>
+      <% } %>
+      <a href="/" class="btn btn-ghost btn-sm">&larr; Back to Dashboard</a>
+    </div>
+  </div>
+
   <div class="container container-sm">
 
     <div class="page-header">
@@ -59,7 +78,7 @@
           <label for="customAlias">Custom alias <span class="hint">— leave blank for auto-generated</span></label>
           <div class="input-prefix-wrap">
             <span class="input-prefix">linkpulse.io/</span>
-            <input type="text" id="customAlias" name="customAlias" class="input input-prefixed"
+            <input type="text" id="customAlias" name="customAlias" class="input"
               placeholder="my-alias"
               value="<%= formData.customAlias || '' %>"
               pattern="[a-zA-Z0-9\-_]+"

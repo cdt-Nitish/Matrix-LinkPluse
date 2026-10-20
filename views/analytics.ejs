@@ -7,15 +7,34 @@
   <meta name="description" content="Click telemetry, device profiling, and traffic sources.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
-<body>
+<body class="app-layout">
 
 <%- include('partials/nav', { page: 'analytics' }) %>
 
 <main class="main-content">
+  <!-- Authenticated Topbar -->
+  <div class="app-topbar">
+    <div class="topbar-left">
+      <button type="button" class="topbar-drawer-btn" aria-label="Toggle navigation drawer" onclick="toggleSidebarDrawer()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="topbar-page-label"><%= typeof isAdmin !== 'undefined' && isAdmin ? 'Platform Analytics' : 'My Analytics' %></span>
+    </div>
+    <div class="topbar-right">
+      <% if (typeof user !== 'undefined' && user) { %>
+        <a href="/profile" class="topbar-user-pill" title="View Profile">
+          <span class="topbar-avatar"><%= (user.fullName ? user.fullName[0] : (user.username ? user.username[0] : 'U')).toUpperCase() %></span>
+          <span><%= user.fullName ? user.fullName.split(' ')[0] : user.username %></span>
+        </a>
+      <% } %>
+      <a href="/links/new" class="btn btn-primary btn-sm">+ New Link</a>
+    </div>
+  </div>
+
   <div class="container">
 
     <div class="analytics-header-row">
@@ -40,7 +59,7 @@
       </div>
     </div>
 
-    <!-- Flat Statistic Cards -->
+    <!-- Summary Statistic Cards -->
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-value"><%= totalClicks.toLocaleString() %></div>
@@ -159,7 +178,7 @@
             <% if (recentEvents && recentEvents.length > 0) { %>
               <% recentEvents.forEach(evt => { %>
               <tr>
-                <td class="muted" style="font-size:0.78rem;">
+                <td class="muted" style="font-size:0.8rem;color:var(--text-secondary);">
                   <%= new Date(evt.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) %>
                 </td>
                 <td>
@@ -169,20 +188,20 @@
                   <%= evt.title %>
                 </td>
                 <td>
-                  <span style="font-size:0.82rem;"><%= evt.countryFlag %> <%= evt.countryName %></span>
+                  <span style="font-size:0.84rem;"><%= evt.countryFlag %> <%= evt.countryName %></span>
                 </td>
                 <td>
-                  <span class="muted" style="font-size:0.8rem;"><%= evt.deviceType %> &bull; <%= evt.browser %></span>
+                  <span class="muted" style="font-size:0.82rem;color:var(--text-secondary);"><%= evt.deviceType %> &bull; <%= evt.browser %></span>
                 </td>
                 <td>
                   <% if (evt.source === 'qr') { %>
-                    <span class="tag" style="color:var(--primary);">QR Scan</span>
+                    <span class="tag" style="color:var(--primary);background:var(--surface-light);border-color:#BFDBFE;">QR Scan</span>
                   <% } else { %>
                     <span class="tag">Direct</span>
                   <% } %>
                 </td>
                 <td style="text-align:right;">
-                  <span style="font-size:0.78rem;color:var(--green);font-weight:500;">200 OK</span>
+                  <span style="font-size:0.78rem;color:var(--success);font-weight:600;">200 OK</span>
                 </td>
               </tr>
               <% }) %>
@@ -231,9 +250,9 @@
                 <div style="font-weight:500;"><%= link.title %></div>
               </td>
               <td style="text-align:right">
-                <span style="font-weight:600;"><%= link.currentClicks.toLocaleString() %></span>
+                <span style="font-weight:600;color:var(--dark-navy);"><%= link.currentClicks.toLocaleString() %></span>
                 <% if (link.maxClicks) { %>
-                  <span class="muted" style="font-size:0.75rem;"> / <%= link.maxClicks %></span>
+                  <span class="muted" style="font-size:0.75rem;color:var(--text-muted);"> / <%= link.maxClicks %></span>
                 <% } %>
                 <div class="click-progress-track">
                   <div class="click-progress-fill" style="width: <%= link.maxClicks ? Math.min(100, Math.round((link.currentClicks / link.maxClicks) * 100)) : Math.min(100, Math.round((link.currentClicks / 1000) * 100)) %>%;"></div>
@@ -266,20 +285,20 @@
 <%- include('partials/footer') %>
 
 <script>
-// Clean Minimal Chart.js Configuration
-Chart.defaults.font.family = 'Inter, -apple-system, sans-serif';
-Chart.defaults.color = '#9aa4b2';
-Chart.defaults.borderColor = '#252c38';
+// Clean Light Mode Chart.js Configuration
+Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, sans-serif";
+Chart.defaults.color = '#64748B';
+Chart.defaults.borderColor = '#E2E8F0';
 
 const cleanTooltip = {
-  backgroundColor: '#161b24',
-  titleColor: '#e6edf3',
-  bodyColor: '#9aa4b2',
-  borderColor: '#323b4b',
-  borderWidth: 1,
+  backgroundColor: '#172554',
+  titleColor: '#FFFFFF',
+  bodyColor: '#F8FAFC',
+  borderColor: '#E2E8F0',
+  borderWidth: 0,
   padding: 8,
-  cornerRadius: 4,
-  titleFont: { size: 12, weight: '500' },
+  cornerRadius: 6,
+  titleFont: { size: 12, weight: '600' },
   bodyFont: { size: 11 },
   boxPadding: 4,
 };
@@ -295,16 +314,16 @@ if (heroCanvas) {
       datasets: [{
         label: 'Clicks',
         data: last7Data.map(d => d.count),
-        borderColor: '#3b82f6',
-        borderWidth: 2,
-        backgroundColor: 'rgba(59, 130, 246, 0.12)',
+        borderColor: '#2563EB',
+        borderWidth: 2.5,
+        backgroundColor: 'rgba(37, 99, 235, 0.08)',
         fill: true,
         tension: 0.25,
-        pointBackgroundColor: '#3b82f6',
-        pointBorderColor: '#161b24',
-        pointBorderWidth: 1.5,
-        pointRadius: 3.5,
-        pointHoverRadius: 5,
+        pointBackgroundColor: '#2563EB',
+        pointBorderColor: '#FFFFFF',
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 6,
       }]
     },
     options: {
@@ -317,12 +336,12 @@ if (heroCanvas) {
       scales: {
         y: {
           beginAtZero: true,
-          grid: { color: '#252c38' },
-          ticks: { color: '#9aa4b2', font: { size: 11 } }
+          grid: { color: '#F1F5F9' },
+          ticks: { color: '#64748B', font: { size: 11 } }
         },
         x: {
           grid: { display: false },
-          ticks: { color: '#9aa4b2', font: { size: 11 } }
+          ticks: { color: '#64748B', font: { size: 11 } }
         }
       }
     }
@@ -340,18 +359,18 @@ function renderDonut(id, labels, data, colors) {
       datasets: [{
         data,
         backgroundColor: colors,
-        borderColor: '#161b24',
-        borderWidth: 1.5,
+        borderColor: '#FFFFFF',
+        borderWidth: 2,
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      cutout: '70%',
+      cutout: '68%',
       plugins: {
         legend: {
           position: 'bottom',
-          labels: { boxWidth: 8, boxHeight: 8, padding: 10, font: { size: 11 }, color: '#9aa4b2' }
+          labels: { boxWidth: 8, boxHeight: 8, padding: 10, font: { size: 11 }, color: '#64748B' }
         },
         tooltip: cleanTooltip,
       }
@@ -359,7 +378,7 @@ function renderDonut(id, labels, data, colors) {
   });
 }
 
-const PALETTE = ['#3b82f6', '#60a5fa', '#38bdf8', '#818cf8', '#475569'];
+const PALETTE = ['#2563EB', '#3B82F6', '#60A5FA', '#93C5FD', '#CBD5E1'];
 
 const deviceData = <%- JSON.stringify(deviceMap) %>;
 renderDonut('deviceChart', Object.keys(deviceData), Object.values(deviceData), PALETTE);
@@ -369,7 +388,7 @@ renderDonut('browserChart', Object.keys(browserData), Object.values(browserData)
 
 const sourceData = <%- JSON.stringify(sourceMap) %>;
 const sourceLabels = Object.keys(sourceData).map(k => k === 'qr' ? 'QR Code' : 'Direct Link');
-renderDonut('sourceChart', sourceLabels, Object.values(sourceData), ['#3b82f6', '#38bdf8']);
+renderDonut('sourceChart', sourceLabels, Object.values(sourceData), ['#2563EB', '#60A5FA']);
 
 // Country bar chart
 const countryData = <%- JSON.stringify(countryMap) %>;
@@ -382,8 +401,8 @@ if (countryCanvas) {
       datasets: [{
         label: 'Clicks',
         data: Object.values(countryData),
-        backgroundColor: '#3b82f6',
-        borderRadius: 3,
+        backgroundColor: '#2563EB',
+        borderRadius: 4,
       }]
     },
     options: {
@@ -397,12 +416,12 @@ if (countryCanvas) {
       scales: {
         x: {
           beginAtZero: true,
-          grid: { color: '#252c38' },
-          ticks: { color: '#9aa4b2', font: { size: 10 } }
+          grid: { color: '#F1F5F9' },
+          ticks: { color: '#64748B', font: { size: 10 } }
         },
         y: {
           grid: { display: false },
-          ticks: { color: '#9aa4b2', font: { size: 11 } }
+          ticks: { color: '#64748B', font: { size: 11 } }
         }
       }
     }

@@ -7,12 +7,30 @@
   <meta name="description" content="Sign in to your LinkPulse workspace.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
 </head>
-<body>
+<body class="auth-page">
 
-<%- include('partials/nav', { page: 'login' }) %>
+  <!-- Compact Top Header for Auth Pages -->
+  <header class="landing-nav-container">
+    <div class="container">
+      <nav class="landing-navbar">
+        <a href="/" class="landing-brand">
+          <div class="sidebar-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="13 2 13 9 20 9"/>
+              <path d="M20 9L13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+            </svg>
+          </div>
+          <span>LinkPulse</span>
+        </a>
+        <div>
+          <a href="/" class="btn btn-ghost btn-sm">&larr; Back to Home</a>
+        </div>
+      </nav>
+    </div>
+  </header>
 
 <main class="main-content">
   <div class="container container-xs auth-page-container">
@@ -34,24 +52,23 @@
         <p class="auth-subline">Enter your credentials to access your dashboard.</p>
       </div>
 
-      <!-- Quick Demo Credentials -->
-      <!-- Quick Demo Credentials for Testing Both Roles -->
+      <!-- Quick Demo Credentials for Fast Evaluation -->
       <div class="auth-demo-banner" style="display:flex;flex-direction:column;gap:8px;">
         <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
-          <span><strong style="color:#60A5FA;">Admin:</strong> <code>admin@linkpulse.io</code> / <code>password123</code></span>
+          <span><strong style="color:var(--primary);">Admin:</strong> <code>admin@linkpulse.io</code></span>
           <button type="button" class="btn btn-sm btn-primary" onclick="document.getElementById('email').value='admin@linkpulse.io';document.getElementById('password').value='password123';" id="fillAdminBtn">
             Fill Admin
           </button>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;width:100%;border-top:1px solid rgba(255,255,255,0.08);padding-top:6px;">
-          <span><strong style="color:#CBD5E1;">User:</strong> <code>demo@linkpulse.io</code> / <code>password123</code></span>
+        <div style="display:flex;align-items:center;justify-content:space-between;width:100%;border-top:1px solid var(--border);padding-top:6px;">
+          <span><strong style="color:var(--text-secondary);">User:</strong> <code>demo@linkpulse.io</code></span>
           <button type="button" class="btn btn-sm btn-ghost" onclick="document.getElementById('email').value='demo@linkpulse.io';document.getElementById('password').value='password123';" id="fillUserBtn">
             Fill User
           </button>
         </div>
       </div>
 
-      <!-- Specific Error Display (Checks if Email is wrong or Password is wrong) -->
+      <!-- Specific Error Display -->
       <% 
         const errList = (typeof errors !== 'undefined' && Array.isArray(errors) && errors.length > 0) 
           ? errors 
@@ -84,7 +101,7 @@
       </div>
       <% } %>
 
-      <!-- Pure Standard HTML Form Submission -->
+      <!-- Form Submission -->
       <form method="POST" action="/login" class="auth-form" id="loginForm">
         <input type="hidden" name="redirectUrl" value="<%= typeof redirectUrl !== 'undefined' ? redirectUrl : '/' %>">
 
@@ -103,7 +120,7 @@
             type="text" 
             id="email" 
             name="email" 
-            class="input <%= (errList.some(e => e.toLowerCase().includes('email') || e.toLowerCase().includes('account'))) ? 'input-error' : '' %>" 
+            class="input" 
             placeholder="admin@linkpulse.io" 
             value="<%= filledEmail %>" 
             required 
@@ -112,35 +129,33 @@
         </div>
 
         <div class="form-group">
-          <div class="form-label-row">
-            <label for="password">Password <span class="required">*</span></label>
-          </div>
+          <label for="password">Password <span class="required">*</span></label>
           <input 
             type="password" 
             id="password" 
             name="password" 
-            class="input <%= (errList.some(e => e.toLowerCase().includes('password'))) ? 'input-error' : '' %>" 
+            class="input" 
             placeholder="Enter your account password" 
             value="<%= typeof demoPassword !== 'undefined' ? demoPassword : '' %>"
             required 
           />
         </div>
 
-        <div class="form-row-between">
-          <label class="form-check">
-            <input type="checkbox" name="remember" value="on" checked>
+        <div class="form-group" style="margin-bottom:1.25rem;">
+          <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-weight:400;color:var(--text-secondary);font-size:0.84rem;">
+            <input type="checkbox" name="remember" value="on" checked style="accent-color:var(--primary);">
             <span>Remember me for 30 days</span>
           </label>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-auth-submit" id="submitLoginBtn">
+        <button type="submit" class="btn btn-primary" style="width:100%;min-height:42px;font-size:0.95rem;" id="submitLoginBtn">
           Sign In
         </button>
       </form>
 
-      <div class="auth-switch-prompt">
+      <div style="text-align:center;margin-top:1.5rem;font-size:0.85rem;color:var(--text-secondary);">
         <span>Don't have an account?</span>
-        <a href="/signup" class="auth-link-bold">Create an account &rarr;</a>
+        <a href="/signup" style="font-weight:600;color:var(--primary);margin-left:4px;">Create an account &rarr;</a>
       </div>
 
     </div>

@@ -7,14 +7,33 @@
   <meta name="description" content="Manage and track all your short links in one place.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
 </head>
-<body>
+<body class="app-layout">
 
 <%- include('partials/nav', { page: 'dashboard' }) %>
 
 <main class="main-content">
+  <!-- Authenticated Topbar -->
+  <div class="app-topbar">
+    <div class="topbar-left">
+      <button type="button" class="topbar-drawer-btn" aria-label="Toggle navigation drawer" onclick="toggleSidebarDrawer()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="topbar-page-label"><%= typeof isAdmin !== 'undefined' && isAdmin ? 'Platform Links' : 'Dashboard' %></span>
+    </div>
+    <div class="topbar-right">
+      <% if (typeof user !== 'undefined' && user) { %>
+        <a href="/profile" class="topbar-user-pill" title="View Profile">
+          <span class="topbar-avatar"><%= (user.fullName ? user.fullName[0] : (user.username ? user.username[0] : 'U')).toUpperCase() %></span>
+          <span><%= user.fullName ? user.fullName.split(' ')[0] : user.username %></span>
+        </a>
+      <% } %>
+      <a href="/links/new" class="btn btn-primary btn-sm">+ New Link</a>
+    </div>
+  </div>
+
   <div class="container">
 
     <div class="page-header">
@@ -51,14 +70,14 @@
     %>
     <div class="alert-created" id="createdAlert">
       <div class="alert-created-info">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
         <div>
-          <span style="font-weight:600;color:var(--green)">Link created successfully</span>
-          <div style="font-size:0.8rem;color:var(--text-2);margin-top:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span style="font-weight:600;color:var(--success)">Link created successfully</span>
+          <div style="font-size:0.82rem;color:var(--text-secondary);margin-top:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
             <span>Short URL:</span>
-            <code id="createdShortUrlText" style="background:#0D131F;border:1px solid var(--border);padding:1px 5px;border-radius:4px;font-weight:500">/<%= query.created %></code>
+            <code id="createdShortUrlText" style="background:var(--surface-light);border:1px solid #BFDBFE;padding:1px 6px;border-radius:4px;font-weight:600;color:var(--primary)">/<%= query.created %></code>
             <% if (createdLink && createdLink.originalUrl) { %>
-              <span class="muted" style="font-size:0.75rem">&rarr; <%= createdLink.originalUrl %></span>
+              <span class="muted" style="font-size:0.78rem;color:var(--text-secondary)">&rarr; <%= createdLink.originalUrl %></span>
             <% } %>
           </div>
         </div>
@@ -85,19 +104,19 @@
     </script>
     <% } %>
 
-    <!-- Flat Statistic Cards -->
+    <!-- Summary Statistic Cards -->
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-value"><%= links.length %></div>
-        <div class="stat-label"><%= typeof isAdmin !== 'undefined' && isAdmin ? 'Platform links' : 'My links' %></div>
+        <div class="stat-label"><%= typeof isAdmin !== 'undefined' && isAdmin ? 'Platform Links' : 'My Links' %></div>
       </div>
       <div class="stat-card">
         <div class="stat-value"><%= links.filter(l => l.status === 'active').length %></div>
-        <div class="stat-label">Active links</div>
+        <div class="stat-label">Active Links</div>
       </div>
       <div class="stat-card">
         <div class="stat-value"><%= links.reduce((s,l) => s + (l.currentClicks || 0), 0).toLocaleString() %></div>
-        <div class="stat-label"><%= typeof isAdmin !== 'undefined' && isAdmin ? 'Total network clicks' : 'My link clicks' %></div>
+        <div class="stat-label"><%= typeof isAdmin !== 'undefined' && isAdmin ? 'Total Network Clicks' : 'My Link Clicks' %></div>
       </div>
       <div class="stat-card">
         <div class="stat-value"><%= campaigns.length %></div>
@@ -105,7 +124,7 @@
       </div>
     </div>
 
-    <!-- Main Links Table -->
+    <!-- Main Links Table Section -->
     <div class="section">
       <div class="section-header">
         <h2 class="section-title"><%= typeof isAdmin !== 'undefined' && isAdmin ? 'All Network Links' : 'My Active Links' %></h2>
@@ -113,7 +132,7 @@
           type="text"
           id="linkSearch"
           class="input"
-          style="width:220px;padding:0.35rem 0.65rem;font-size:0.8rem;"
+          style="width:220px;padding:0.4rem 0.75rem;font-size:0.84rem;"
           placeholder="Search links…"
           oninput="filterLinks(this.value)"
         >
@@ -126,9 +145,9 @@
               <polyline points="13 2 13 9 20 9"/><path d="M20 9L13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
             </svg>
           </div>
-          <h3 style="font-size:1.15rem;font-weight:600;color:var(--text-1);margin-bottom:0.4rem;">No Short Links Yet</h3>
-          <p class="muted" style="max-width:440px;margin:0 auto 1.25rem;">
-            You have full creation rights. Generate custom branded slugs, download vector QR codes, and share them across your channels.
+          <h3 style="font-size:1.15rem;font-weight:600;color:var(--dark-navy);margin-bottom:0.4rem;">No Short Links Yet</h3>
+          <p class="muted" style="max-width:440px;margin:0 auto 1.25rem;color:var(--text-secondary);font-size:0.9rem;">
+            Generate custom branded slugs, download dynamic QR codes, and track real-time click analytics.
           </p>
           <a href="/links/new" class="btn btn-primary">+ Create Your First Link</a>
         </div>
@@ -162,20 +181,20 @@
                 <% if (campaign) { %>
                   <span class="tag"><%= campaign.name %></span>
                 <% } else { %>
-                  <span class="muted">—</span>
+                  <span class="muted" style="color:var(--text-muted);">&mdash;</span>
                 <% } %>
               </td>
               <td style="text-align:right">
-                <span style="font-weight:600;"><%= link.currentClicks.toLocaleString() %></span><% if (link.maxClicks) { %><span class="muted" style="font-size:0.75rem"> / <%= link.maxClicks %></span><% } %>
+                <span style="font-weight:600;color:var(--dark-navy)"><%= link.currentClicks.toLocaleString() %></span><% if (link.maxClicks) { %><span class="muted" style="font-size:0.75rem;color:var(--text-muted)"> / <%= link.maxClicks %></span><% } %>
               </td>
               <td>
                 <span class="badge badge-<%= link.status %>"><%= link.status %></span>
               </td>
-              <td style="font-size:0.8rem;color:var(--text-2);">
+              <td style="font-size:0.8rem;color:var(--text-secondary);">
                 <% if (link.expiresAt) { %>
                   <%= new Date(link.expiresAt).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}) %>
                 <% } else { %>
-                  <span class="muted">Never</span>
+                  <span class="muted" style="color:var(--text-muted)">Never</span>
                 <% } %>
               </td>
               <td style="text-align:right">
@@ -195,8 +214,8 @@
                       <% } %>
                     </button>
                   </form>
-                  <form method="POST" action="/links/<%= link.shortCode %>/delete" onsubmit="return confirm('Permanently delete link /<%= link.shortCode %>?')" style="margin:0;display:inline-flex">
-                    <button type="submit" class="btn-action" title="Delete link" style="color:var(--red)">
+                  <form method="POST" action="/links/<%= link.shortCode %>/delete" onsubmit="return confirm('Permanently delete link /<%= link.shortCode %>? This action cannot be undone.')" style="margin:0;display:inline-flex">
+                    <button type="submit" class="btn-action" title="Delete link" style="color:var(--error)">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                     </button>
                   </form>
@@ -218,8 +237,9 @@
 
 <script>
 function filterLinks(q) {
+  const query = q.toLowerCase();
   document.querySelectorAll('#linksTable tbody tr').forEach(r => {
-    r.style.display = r.dataset.q.includes(q.toLowerCase()) ? '' : 'none';
+    r.style.display = r.dataset.q.includes(query) ? '' : 'none';
   });
 }
 </script>

@@ -5,14 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Campaigns — LinkPulse</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
 </head>
-<body>
+<body class="app-layout">
 
 <%- include('partials/nav', { page: 'campaigns' }) %>
 
 <main class="main-content">
+  <!-- Authenticated Topbar -->
+  <div class="app-topbar">
+    <div class="topbar-left">
+      <button type="button" class="topbar-drawer-btn" aria-label="Toggle navigation drawer" onclick="toggleSidebarDrawer()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="topbar-page-label">Campaigns</span>
+    </div>
+    <div class="topbar-right">
+      <% if (typeof user !== 'undefined' && user) { %>
+        <a href="/profile" class="topbar-user-pill" title="View Profile">
+          <span class="topbar-avatar"><%= (user.fullName ? user.fullName[0] : (user.username ? user.username[0] : 'U')).toUpperCase() %></span>
+          <span><%= user.fullName ? user.fullName.split(' ')[0] : user.username %></span>
+        </a>
+      <% } %>
+      <a href="/links/new" class="btn btn-primary btn-sm">+ New Link</a>
+    </div>
+  </div>
+
   <div class="container">
 
     <div class="page-header">
@@ -25,12 +44,12 @@
     <!-- Create Campaign Form -->
     <div class="card" style="margin-bottom:1.5rem">
       <div class="card-title">Create Campaign</div>
-      <form method="POST" action="/campaigns/new" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
-        <div style="flex:1;min-width:200px;">
-          <label for="campaignNameInput">Campaign name</label>
+      <form method="POST" action="/campaigns/new" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+        <div style="flex:1;min-width:220px;">
+          <label for="campaignNameInput">Campaign name <span class="required">*</span></label>
           <input type="text" id="campaignNameInput" name="name" class="input" placeholder="e.g. Q4 Marketing" required>
         </div>
-        <div style="flex:1;min-width:200px;">
+        <div style="flex:1;min-width:220px;">
           <label for="campaignTagsInput">Tags <span class="hint">— comma-separated</span></label>
           <input type="text" id="campaignTagsInput" name="tags" class="input" placeholder="marketing, launch">
         </div>
@@ -40,7 +59,7 @@
 
     <!-- Campaigns Grid -->
     <% if (campaigns.length === 0) { %>
-      <div class="card" style="text-align:center;padding:2.5rem;"><p class="muted">No campaigns created yet.</p></div>
+      <div class="card" style="text-align:center;padding:2.5rem;"><p class="muted" style="color:var(--text-secondary);">No campaigns created yet.</p></div>
     <% } else { %>
     <div class="campaign-grid">
       <% campaigns.forEach(c => {

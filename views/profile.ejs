@@ -6,14 +6,27 @@
   <title><%= title %> — LinkPulse</title>
   <meta name="description" content="View and manage your LinkPulse workspace profile.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
 </head>
-<body>
+<body class="app-layout">
 
 <%- include('partials/nav', { page: 'profile' }) %>
 
 <main class="main-content">
+  <!-- Authenticated Topbar -->
+  <div class="app-topbar">
+    <div class="topbar-left">
+      <button type="button" class="topbar-drawer-btn" aria-label="Toggle navigation drawer" onclick="toggleSidebarDrawer()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="topbar-page-label">Account Profile</span>
+    </div>
+    <div class="topbar-right">
+      <a href="/logout" class="btn btn-ghost btn-sm" style="color:var(--error);">Sign Out</a>
+    </div>
+  </div>
+
   <div class="container container-sm">
 
     <div class="page-header">
@@ -21,7 +34,7 @@
         <h1 class="page-title">Profile</h1>
         <p class="page-sub">Account credentials, role permissions, and organization details.</p>
       </div>
-      <a href="/logout" class="btn btn-ghost" style="color:var(--red);">
+      <a href="/logout" class="btn btn-ghost" style="color:var(--error);">
         Sign Out
       </a>
     </div>
@@ -73,7 +86,7 @@
 
         <div class="detail-block">
           <span class="detail-label">Session Status</span>
-          <span style="font-size:0.85rem;color:var(--green);font-weight:500;">Active</span>
+          <span style="font-size:0.85rem;color:var(--success);font-weight:600;">Active</span>
         </div>
       </div>
 

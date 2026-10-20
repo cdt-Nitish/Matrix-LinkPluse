@@ -11,9 +11,27 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
 </head>
-<body>
+<body class="public-layout">
 
-<%- include('partials/nav', { page: '' }) %>
+  <!-- Minimal Brand Header -->
+  <header class="landing-nav-container">
+    <div class="container">
+      <nav class="landing-navbar">
+        <a href="/" class="landing-brand">
+          <div class="sidebar-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="13 2 13 9 20 9"/>
+              <path d="M20 9L13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+            </svg>
+          </div>
+          <span>LinkPulse</span>
+        </a>
+        <div>
+          <a href="/" class="btn btn-ghost btn-sm">&larr; Back to Home</a>
+        </div>
+      </nav>
+    </div>
+  </header>
 
 <main class="main-content">
   <div class="container container-xs">
@@ -23,8 +41,8 @@
       %>
       <div class="icon-lg"><%= icons[type] || '⚠️' %></div>
       <h1 class="page-title"><%= titles[type] || 'Something went wrong' %></h1>
-      <p class="page-sub"><%= message %></p>
-      <a href="/" class="btn btn-primary">← Back to Dashboard</a>
+      <p class="page-sub" style="margin:0.5rem auto 1.5rem;"><%= message %></p>
+      <a href="/" class="btn btn-primary">&larr; Return to Dashboard</a>
     </div>
   </div>
 </main>
